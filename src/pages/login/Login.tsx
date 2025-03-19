@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; 
 import { login } from "../../services/authService";
 import * as S from "./styles";
 import { TextInput } from "./components/TextInput";
@@ -7,6 +8,7 @@ const Login = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate(); 
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,7 +17,7 @@ const Login = () => {
     const result = await login(username, password);
 
     if (result) {
-      alert("Login realizado com sucesso!");
+      navigate("/"); 
     } else {
       setError("Falha no login. Verifique suas credenciais.");
     }
