@@ -1,19 +1,30 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./pages/login/Login";
-import Home from "./pages/home/Home";
-import ProtectedRoute from "../src/components/ProtectedRoute/ProtectedRoute";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Provider } from "react-redux";
+import { BrowserRouter, Route, Routes } from "react-router";
+import { PersistGate } from "redux-persist/integration/react";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Home from "./pages/home";
+import Login from "./pages/login";
+import { persistor, store } from "./store";
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-
-        <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<Home />} />
-        </Route>
-      </Routes>
-    </Router>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route element={<ProtectedRoute />}>
+                <Route path="/" element={<Home />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </QueryClientProvider>
+      </PersistGate>
+    </Provider>
   );
 }
 

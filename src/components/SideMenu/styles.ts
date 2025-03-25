@@ -4,11 +4,13 @@ interface MenuItemProps {
   selected?: boolean;
 }
 
-export const ContentContainer = styled.div``;
+export const ContentContainer = styled.div`
+  display: flex;
+`;
 
 export const MenuContainer = styled.div`
   width: 250px;
-  background: #FFFFFF;
+  background: #fff;
   border-right: 1px solid #ddd;
   overflow: hidden;
   box-sizing: border-box;
@@ -21,11 +23,11 @@ export const TitleContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 1px solid #e5e5e5;
 
   h1 {
     font-size: 1.25rem;
-    color: #1E293B;
+    color: #1e293b;
     padding: 1rem;
     margin: 0;
     width: 100%;
@@ -70,7 +72,7 @@ export const MenuItem = styled.div<MenuItemProps>`
 export const ButtonContainer = styled.div`
   display: flex;
   padding: 1rem;
-  border-top: 1px solid #E5E5E5;
+  border-top: 1px solid #e5e5e5;
   justify-content: flex-start;
   align-items: center;
 `;
@@ -84,7 +86,7 @@ export const LogoutButton = styled.button`
   gap: 0.5rem;
   width: 100%;
   color: red;
-  background-color: #FFFFFF;
+  background-color: #fff;
   padding: 0.63rem 1rem;
   border-radius: 6px;
   cursor: pointer;

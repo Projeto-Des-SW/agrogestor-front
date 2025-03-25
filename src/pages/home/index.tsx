@@ -1,17 +1,11 @@
 import { useState } from "react";
-import { Navigate } from "react-router-dom";
-import SideMenu from "../../components/SideMenu/SideMenu";
-import Sales from "./views/Sales";
-import Production from "./views/Production";
+import SideMenu from "../../components/SideMenu";
 import * as S from "./styles";
+import Production from "./views/Production";
+import Sales from "./views/Sales";
 
 const Home = () => {
   const [selectedPage, setSelectedPage] = useState("sales");
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    return <Navigate to="/" replace />;
-  }
 
   const renderPage = () => {
     switch (selectedPage) {
