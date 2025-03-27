@@ -1,11 +1,16 @@
 import styled from "styled-components";
 
-type Props = {
+type Props<T extends React.ElementType> = {
   children: React.ReactNode;
-  variant?: "default" | "ghost";
-} & React.ButtonHTMLAttributes<HTMLButtonElement>;
+  variant: "default" | "ghost";
+  as: T;
+} & React.ComponentProps<T>;
 
-export function Button({ children, variant = "default", ...props }: Props) {
+export default function Button<T extends React.ElementType>({
+  children,
+  variant = "default",
+  ...props
+}: Props<T>) {
   return (
     <StyledButton $variant={variant} {...props}>
       {children}

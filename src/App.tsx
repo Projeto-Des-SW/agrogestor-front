@@ -1,9 +1,12 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "react-redux";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { PersistGate } from "redux-persist/integration/react";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Home from "./pages/home";
+import MainLayout from "./pages/(protected)/layout";
+import Production from "./pages/(protected)/pages/Production";
+import Sales from "./pages/(protected)/pages/sales";
+import NewSale from "./pages/(protected)/pages/sales/new";
 import Login from "./pages/login";
 import { persistor, store } from "./store";
 
@@ -16,9 +19,16 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
             <Routes>
-              <Route path="/login" element={<Login />} />
+              <Route path="login" element={<Login />} />
               <Route element={<ProtectedRoute />}>
-                <Route path="/" element={<Home />} />
+                <Route element={<MainLayout />}>
+                  <Route index element={<Navigate to="/vendas" />} />
+                  <Route path="vendas">
+                    <Route index element={<Sales />} />
+                    <Route path="new" element={<NewSale />} />
+                  </Route>
+                  <Route path="producao" element={<Production />} />
+                </Route>
               </Route>
             </Routes>
           </BrowserRouter>

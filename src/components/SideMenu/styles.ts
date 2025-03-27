@@ -1,11 +1,9 @@
+import { NavLink } from "react-router";
 import styled from "styled-components";
-
-interface MenuItemProps {
-  selected?: boolean;
-}
 
 export const ContentContainer = styled.div`
   display: flex;
+  flex-direction: column;
 `;
 
 export const MenuContainer = styled.div`
@@ -44,7 +42,7 @@ export const ItensContainer = styled.div`
   overflow: hidden;
 `;
 
-export const MenuItem = styled.div<MenuItemProps>`
+export const MenuItem = styled(NavLink)`
   display: flex;
   flex-direction: row;
   width: 100%;
@@ -53,10 +51,14 @@ export const MenuItem = styled.div<MenuItemProps>`
   gap: 1rem;
   padding: 0.63rem 1rem;
   overflow: hidden;
+  text-decoration: none;
   box-sizing: border-box;
   cursor: pointer;
-  background: ${({ selected }) => (selected ? "#f5f5f5" : "transparent")};
   border-radius: 6px;
+
+  &.active {
+    background: #f5f5f5;
+  }
 
   p {
     width: 100%;

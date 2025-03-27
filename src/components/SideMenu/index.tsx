@@ -1,17 +1,9 @@
-import * as S from "./styles";
 import { FaRegFileAlt } from "react-icons/fa";
 import { LuMilk } from "react-icons/lu";
 import { MdOutlineLogout } from "react-icons/md";
+import * as S from "./styles";
 
-interface SideMenuProps {
-  selectedPage: string;
-  setSelectedPage: (page: string) => void;
-}
-
-const SideMenu: React.FC<SideMenuProps> = ({
-  selectedPage,
-  setSelectedPage,
-}) => {
+export default function SideMenu() {
   return (
     <S.MenuContainer>
       <S.ContentContainer>
@@ -19,17 +11,11 @@ const SideMenu: React.FC<SideMenuProps> = ({
           <h1>Agrogestor</h1>
         </S.TitleContainer>
         <S.ItensContainer>
-          <S.MenuItem
-            onClick={() => setSelectedPage("sales")}
-            selected={selectedPage === "sales"}
-          >
+          <S.MenuItem to="/vendas">
             <FaRegFileAlt color="#1E293B" />
             <p>Vendas</p>
           </S.MenuItem>
-          <S.MenuItem
-            onClick={() => setSelectedPage("production")}
-            selected={selectedPage === "production"}
-          >
+          <S.MenuItem to="/producao">
             <LuMilk color="#1E293B" />
             <p>Produção</p>
           </S.MenuItem>
@@ -48,6 +34,4 @@ const SideMenu: React.FC<SideMenuProps> = ({
       </S.ButtonContainer>
     </S.MenuContainer>
   );
-};
-
-export default SideMenu;
+}
