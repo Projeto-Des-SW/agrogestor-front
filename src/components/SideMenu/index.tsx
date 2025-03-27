@@ -1,9 +1,11 @@
 import { FaRegFileAlt } from "react-icons/fa";
 import { LuMilk } from "react-icons/lu";
 import { MdOutlineLogout } from "react-icons/md";
+import { useAppDispatch, userActions } from "../../store";
 import * as S from "./styles";
 
 export default function SideMenu() {
+  const dispatch = useAppDispatch();
   return (
     <S.MenuContainer>
       <S.ContentContainer>
@@ -24,8 +26,7 @@ export default function SideMenu() {
       <S.ButtonContainer>
         <S.LogoutButton
           onClick={() => {
-            localStorage.removeItem("token");
-            window.location.href = "/login";
+            dispatch(userActions.logout());
           }}
         >
           <MdOutlineLogout />

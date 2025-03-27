@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router";
 import Button from "../../components/Button";
 import TextInput from "../../components/TextInput";
 import { login } from "../../services/api";
@@ -7,6 +8,7 @@ import * as S from "./styles";
 
 export default function Login() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const { mutate, error } = useMutation({
     mutationFn: (e: React.FormEvent<HTMLFormElement>) => {
@@ -17,7 +19,10 @@ export default function Login() {
         data.get("password") as string,
       );
     },
-    onSuccess: (data) => dispatch(userActions.login(data)),
+    onSuccess: (data) => {
+      dispatch(userActions.login(data));
+      navigate("/");
+    },
   });
 
   function handleErrors(errorMessage: string) {

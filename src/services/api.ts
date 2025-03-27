@@ -1,7 +1,9 @@
 import axios from "axios";
 import { Group } from "../models/group";
 import { Member } from "../models/member";
+import { ProductPrice } from "../models/productPrice";
 import { mapToSale, Sale } from "../models/sale";
+import { NewSale } from "../pages/(protected)/pages/sales/new";
 
 const api = axios.create({ baseURL: import.meta.env.VITE_API_URL });
 
@@ -39,4 +41,28 @@ export async function getSales(
       params,
     })
   ).data.map((e: Sale) => mapToSale(e)) as Sale[];
+}
+
+export async function getProducts(token: string) {
+  return (
+    await api.get("products", { headers: { Authorization: `Bearer ${token}` } })
+  ).data as string[];
+}
+
+export async function getProductPrice(
+  token: string,
+  params: { product: string; date: Date; memberName: string },
+) {
+  return (
+    await api.get("prices", {
+      headers: { Authorization: `Bearer ${token}` },
+      params,
+    })
+  ).data as ProductPrice;
+}
+
+export async function postSale(token: string, sale: NewSale) {
+  return api.post("sales", sale, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 }

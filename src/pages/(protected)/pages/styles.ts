@@ -146,3 +146,25 @@ export const Table = styled.table`
     }
   }
 `;
+
+export const MemberAndDate = styled.div`
+  display: flex;
+  justify-content: stretch;
+
+  select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    background-color: #fff;
+    width: 180px;
+  }
+
+  input {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    width: 250px;
+  }
+`;
