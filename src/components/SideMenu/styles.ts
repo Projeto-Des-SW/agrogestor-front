@@ -1,5 +1,5 @@
-import { NavLink } from "react-router";
 import styled from "styled-components";
+import { NavLink } from "react-router";
 
 export const ContentContainer = styled.div`
   display: flex;
@@ -8,10 +8,9 @@ export const ContentContainer = styled.div`
 
 export const MenuContainer = styled.div`
   width: 250px;
+  font-size: 14px;
   background: #fff;
-  border-right: 1px solid #ddd;
-  overflow: hidden;
-  box-sizing: border-box;
+  border-right: 1px solid #e5e5e5;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -19,14 +18,16 @@ export const MenuContainer = styled.div`
 
 export const TitleContainer = styled.div`
   display: flex;
+  height: 70px;
   align-items: center;
-  justify-content: flex-start;
   border-bottom: 1px solid #e5e5e5;
 
-  h1 {
-    font-size: 1.25rem;
-    color: #1e293b;
-    padding: 1rem;
+  a {
+    color: #001420;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 15px;
     margin: 0;
     width: 100%;
   }
@@ -35,35 +36,23 @@ export const TitleContainer = styled.div`
 export const ItensContainer = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 1rem;
-  gap: 0.25rem;
-  overflow: hidden;
+  padding: 15px;
+  gap: 4px;
 `;
 
 export const MenuItem = styled(NavLink)`
   display: flex;
-  flex-direction: row;
-  width: 100%;
-  justify-content: flex-start;
+  font-weight: 600;
   align-items: center;
-  gap: 1rem;
-  padding: 0.63rem 1rem;
-  overflow: hidden;
+  gap: 16px;
+  padding: 15px;
   text-decoration: none;
-  box-sizing: border-box;
   cursor: pointer;
   border-radius: 6px;
+  color: #001420;
 
   &.active {
-    background: #f5f5f5;
-  }
-
-  p {
-    width: 100%;
-    margin: 0;
-    color: #1e293b;
+    background: #ededeb;
   }
 
   &:hover {
@@ -71,26 +60,17 @@ export const MenuItem = styled(NavLink)`
   }
 `;
 
-export const ButtonContainer = styled.div`
-  display: flex;
-  padding: 1rem;
-  border-top: 1px solid #e5e5e5;
-  justify-content: flex-start;
-  align-items: center;
-`;
-
 export const LogoutButton = styled.button`
   all: unset;
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
   align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-  color: red;
+  gap: 8px;
+  color: #ef4444;
   background-color: #fff;
-  padding: 0.63rem 1rem;
-  border-radius: 6px;
+  height: 70px;
+  padding: 0 30px;
+  border-top: 1px solid #e5e5e5;
   cursor: pointer;
 
   &:hover {

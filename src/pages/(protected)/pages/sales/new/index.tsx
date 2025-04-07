@@ -1,3 +1,14 @@
+import {
+  Autocomplete,
+  Card,
+  createFilterOptions,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TextField,
+} from "@mui/material";
 import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
 import { sum } from "lodash-es";
 import { useEffect } from "react";
@@ -25,6 +36,9 @@ export type NewSale = {
     hasUserChangedPrice: boolean;
   }[];
 };
+
+const filter =
+  createFilterOptions<Awaited<ReturnType<typeof getMembers>>[number]>();
 
 export default function NewSale() {
   const { token } = useAuth();
@@ -74,11 +88,10 @@ export default function NewSale() {
 
   useEffect(() => {
     setSale((draft) => {
-      draft.memberName = members?.[0].name;
+      draft.memberName = members?.[0]?.name;
     });
   }, [members, setSale]);
 
-  console.log(sale);
   return (
     <S.Container>
       <S.Header>
@@ -87,23 +100,58 @@ export default function NewSale() {
           Voltar
         </Button>
       </S.Header>
-      <S.Card>
+      <Card
+        sx={{
+          padding: "25px",
+          gap: "16px",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <S.Title>Nova Venda</S.Title>
         <S.MemberAndDate>
-          <select
-            onChange={({ target: { value } }) =>
+          <Autocomplete
+            sx={{ width: 300 }}
+            size="small"
+            onChange={(_, value) =>
               setSale((draft) => {
-                draft.memberName = value;
+                draft.memberName =
+                  typeof value === "string" ? value : value?.name;
               })
             }
-            value={sale.memberName}
-          >
-            {members?.map((member) => (
-              <option key={member.id} value={member.name}>
-                {member.name}
-              </option>
-            )) ?? null}
-          </select>
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option.name
+            }
+            options={members ?? []}
+            filterOptions={(options, params) => {
+              const filtered = filter(options, params);
+
+              const { inputValue } = params;
+
+              const isExisting = options.some(
+                (option) => inputValue === option.name,
+              );
+              if (inputValue !== "" && !isExisting) {
+                filtered.push({
+                  id: 0,
+                  disabled: false,
+                  groupId: 0,
+                  name: inputValue,
+                  group: {
+                    disabled: false,
+                    id: 0,
+                    name: "",
+                  },
+                });
+              }
+              return filtered;
+            }}
+            autoSelect
+            freeSolo
+            renderInput={(params) => (
+              <TextField sx={{ border: "none" }} {...params} label="Membro" />
+            )}
+          />
           <input
             type="date"
             value={sale.date?.toISOString().split("T")[0]}
@@ -114,20 +162,21 @@ export default function NewSale() {
             }
           />
         </S.MemberAndDate>
-        <S.Table>
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Produto</th>
-              <th>Quantidade</th>
-              <th>Preço Unit.</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Data</TableCell>
+              <TableCell>Produto</TableCell>
+              <TableCell>Quantidade</TableCell>
+              <TableCell>Preço Unit.</TableCell>
+              <TableCell>Total</TableCell>
+              <TableCell />
+            </TableRow>
+          </TableHead>
+          <TableBody>
             {sale.items.map((item, index) => (
-              <tr key={index}>
-                <td>
+              <TableRow key={index}>
+                <TableCell>
                   <input
                     onChange={({ target: { value } }) =>
                       setSale((draft) => {
@@ -138,8 +187,8 @@ export default function NewSale() {
                     type="date"
                     value={item.date.toISOString().split("T")[0]}
                   />
-                </td>
-                <td>
+                </TableCell>
+                <TableCell>
                   <select
                     onChange={({ target: { value } }) =>
                       setSale((draft) => {
@@ -152,8 +201,8 @@ export default function NewSale() {
                       <option key={product}>{product}</option>
                     )) ?? null}
                   </select>
-                </td>
-                <td>
+                </TableCell>
+                <TableCell>
                   <input
                     onChange={({ target: { value } }) =>
                       setSale((draft) => {
@@ -164,8 +213,8 @@ export default function NewSale() {
                     value={item.quantity}
                     min={0}
                   />
-                </td>
-                <td>
+                </TableCell>
+                <TableCell>
                   <input
                     type="number"
                     onChange={({ target: { value } }) =>
@@ -181,18 +230,18 @@ export default function NewSale() {
                     }
                     min={0}
                   />
-                </td>
-                <td>
+                </TableCell>
+                <TableCell>
                   {formatCurrency(
                     (item.hasUserChangedPrice
                       ? item.price
                       : (productPrices[index]?.price ?? 0)) * item.quantity,
                   )}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </S.Table>
+          </TableBody>
+        </Table>
         <Button
           onClick={() =>
             setSale((draft) => {
@@ -216,7 +265,7 @@ export default function NewSale() {
           Cancelar
         </Button>
         <Button onClick={() => submit(sale)}>Salvar</Button>
-      </S.Card>
+      </Card>
     </S.Container>
   );
 }

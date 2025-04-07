@@ -1,3 +1,14 @@
+import {
+  Card,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from "@mui/material";
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useQuery } from "@tanstack/react-query";
 import { sum } from "lodash-es";
 import { Badge, Trash2 } from "lucide-react";
@@ -5,7 +16,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import Button from "../../../../components/Button";
 import { useAuth } from "../../../../hooks/useAuth";
-import { getGroups, getMembers, getSales } from "../../../../services/api";
+import { getMembers, getSales } from "../../../../services/api";
 import { formatCurrency } from "../../../../util/formatCurrency";
 import * as S from "../styles";
 
@@ -25,10 +36,9 @@ export default function Sales() {
     queryKey: ["members"],
     queryFn: () => getMembers(token!),
   });
-  const { data: groups } = useQuery({
-    queryKey: ["groups"],
-    queryFn: () => getGroups(token!),
-  });
+  const groups = Array.from(
+    new Map(members?.map((member) => [member.group.id, member.group])).values(),
+  );
   const { data: sales } = useQuery({
     queryKey: ["sales", filters],
     queryFn: () => getSales(token!, filters),
@@ -43,69 +53,87 @@ export default function Sales() {
         </Button>
       </S.Header>
 
-      <S.Card>
+      <Card
+        sx={{
+          padding: "25px",
+          gap: "8px",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <S.CardHeader>
           <S.Title>Vendas</S.Title>
           <S.Filters>
-            <select
-              onChange={(e) =>
-                setMemberFilter(
-                  e.target.value === "all" ? undefined : Number(e.target.value),
-                )
-              }
-            >
-              <option value="all">Todos os clientes</option>
-              {members?.map((member) => (
-                <option key={member.id} value={member.id}>
-                  {member.name}
-                </option>
-              )) ?? null}
-            </select>
-            <select
-              onChange={({ target: { value } }) =>
-                setGroupFilter(value === "all" ? undefined : Number(value))
-              }
-            >
-              <option value="all">Todos os grupos</option>
-              {groups?.map((group) => (
-                <option key={group.id} value={group.id}>
-                  {group.name}
-                </option>
-              )) ?? null}
-            </select>
-            <input
-              type="date"
-              onChange={({ target: { value } }) =>
-                setStartDateFilter(value === "" ? undefined : new Date(value))
-              }
+            <Autocomplete
+              sx={{ width: 300 }}
+              size="small"
+              onChange={(_, value) => setMemberFilter(value?.id)}
+              getOptionLabel={(option) => option.name}
+              options={[
+                { name: "Todos os membros", id: undefined },
+                ...(members ?? []),
+              ]}
+              autoSelect
+              disableClearable
+              defaultValue={{ name: "Todos os membros", id: undefined }}
+              renderInput={(params) => (
+                <TextField
+                  sx={{ border: "none" }}
+                  {...params}
+                  label="Filtrar membros"
+                />
+              )}
             />
-            <input
-              type="date"
-              onChange={({ target: { value } }) =>
-                setEndDateFilter(value === "" ? undefined : new Date(value))
-              }
+            <Autocomplete
+              sx={{ width: 300 }}
+              size="small"
+              onChange={(_, value) => setGroupFilter(value?.id)}
+              getOptionLabel={(option) => option.name}
+              options={[
+                { name: "Todos os grupos", id: undefined },
+                ...(groups ?? []),
+              ]}
+              autoSelect
+              disableClearable
+              defaultValue={{ name: "Todos os grupos", id: undefined }}
+              renderInput={(params) => (
+                <TextField
+                  sx={{ border: "none" }}
+                  {...params}
+                  label="Filtrar grupos"
+                />
+              )}
+            />
+            <DatePicker
+              label="Início"
+              slotProps={{ textField: { size: "small" } }}
+              onChange={(date) => setStartDateFilter(date?.toDate())}
+            />
+            <DatePicker
+              label="Fim"
+              slotProps={{ textField: { size: "small" } }}
+              onChange={(date) => setEndDateFilter(date?.toDate())}
             />
           </S.Filters>
         </S.CardHeader>
-        <S.Table>
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Cliente</th>
-              <th>Itens</th>
-              <th className="right">Valor</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Data</TableCell>
+              <TableCell>Cliente</TableCell>
+              <TableCell>Valor</TableCell>
+              <TableCell></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
             {sales?.map((sale) => (
-              <tr key={sale.id}>
-                <td>{sale.date.toLocaleDateString()}</td>
-                <td>{sale.member.name}</td>
-                <td>
+              <TableRow key={sale.id}>
+                <TableCell>{sale.date.toLocaleDateString()}</TableCell>
+                <TableCell>{sale.member.name}</TableCell>
+                <TableCell>
                   <Badge>Leite (10)</Badge>
-                </td>
-                <td className="right">
+                </TableCell>
+                <TableCell className="right">
                   {formatCurrency(
                     sum(
                       sale.saleItems.map(
@@ -114,17 +142,17 @@ export default function Sales() {
                       ),
                     ),
                   )}
-                </td>
-                <td>
+                </TableCell>
+                <TableCell>
                   <Button variant="ghost">
                     <Trash2 />
                   </Button>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )) ?? null}
-          </tbody>
-        </S.Table>
-      </S.Card>
+          </TableBody>
+        </Table>
+      </Card>
     </S.Container>
   );
 }
