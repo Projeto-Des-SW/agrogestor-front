@@ -2,7 +2,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider/LocalizationProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "react-redux";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes } from "react-router";
 import { PersistGate } from "redux-persist/integration/react";
 import ProtectedRoute from "./components/ProtectedRoute";
 import MainLayout from "./pages/(protected)/layout";
@@ -12,6 +12,9 @@ import Sales from "./pages/(protected)/pages/sales";
 import NewSale from "./pages/(protected)/pages/sales/new";
 import Login from "./pages/login";
 import { persistor, store } from "./store";
+import Users from "./pages/(protected)/pages/users";
+import NewUser from "./pages/(protected)/pages/users/new";
+import Home from "./pages/(protected)/pages/home";
 
 const queryClient = new QueryClient();
 
@@ -26,7 +29,7 @@ function App() {
                 <Route path="login" element={<Login />} />
                 <Route element={<ProtectedRoute />}>
                   <Route element={<MainLayout />}>
-                    <Route index element={<Navigate to="/vendas" />} />
+                    <Route index element={<Home />} />
                     <Route path="vendas">
                       <Route index element={<Sales />} />
                       <Route path="new" element={<NewSale />} />
@@ -36,6 +39,11 @@ function App() {
                       <Route index element={<Production />} />
                       <Route path="new" element={<NewProduction />} />
                       <Route path="edit/:id" element={<NewProduction />} />
+                    </Route>
+                    <Route path="usuarios">
+                      <Route index element={<Users />} />
+                      <Route path="new" element={<NewUser />} />
+                      <Route path="edit/:id" element={<NewUser />} />
                     </Route>
                   </Route>
                 </Route>

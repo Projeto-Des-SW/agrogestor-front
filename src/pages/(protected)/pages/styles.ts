@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 export const Container = styled.div`
@@ -46,6 +47,10 @@ export const Filters = styled.div`
   gap: 0.75rem;
   flex-wrap: wrap;
   align-items: center;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 export const MemberAndDate = styled.div`
@@ -54,10 +59,34 @@ export const MemberAndDate = styled.div`
   gap: 20px;
 `;
 
-
 export const Actions = styled.div`
   display: flex;
   gap: 12px;
   justify-content: flex-end;
   margin-top: 16px;
 `;
+
+export const ActionsContainer = styled("div")({
+  display: "flex",
+  gap: "16px",
+  marginTop: "8px",
+  flexWrap: "wrap",
+});
+
+export const ActionCard = styled(Link)({
+  flex: 1,
+  minWidth: "200px",
+  padding: "16px",
+  border: "1px solid #eee",
+  borderRadius: "8px",
+  textDecoration: "none",
+  color: "#1E293B",
+  display: "flex",
+  alignItems: "center",
+  gap: "12px",
+  transition: "all 0.2s ease-in-out",
+  fontWeight: 500,
+  "&:hover": {
+    backgroundColor: "#f9f9f9",
+  },
+});

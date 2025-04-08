@@ -1,4 +1,5 @@
 import {
+  Box,
   Card,
   IconButton,
   Table,
@@ -129,50 +130,52 @@ export default function Production() {
           </S.Filters>
         </S.CardHeader>
 
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Data</TableCell>
-              <TableCell>Membro</TableCell>
-              <TableCell>Total</TableCell>
-              <TableCell></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {productionLogs?.map((log) => (
-              <TableRow
-                key={log.id}
-                onClick={() => navigate(`edit/${log.id}`)}
-                sx={{
-                  cursor: "pointer",
-                  ":hover": { backgroundColor: "#f8f8f8" },
-                }}
-              >
-                <TableCell sx={{ width: "33%" }}>
-                  {log.date.toLocaleDateString()}
-                </TableCell>
-                <TableCell sx={{ width: "33%" }}>{log.member.name}</TableCell>
-                <TableCell sx={{ width: "33%" }}>
-                  {formatCurrency(
-                    sum(
-                      log.productionEntries.map(
-                        (entry) => entry.quantity * entry.price,
-                      ),
-                    ),
-                  )}
-                </TableCell>
-                <TableCell onClick={(e) => e.stopPropagation()}>
-                  <IconButton
-                    sx={{ color: "red" }}
-                    onClick={() => handleDeleteLog(log.id)}
-                  >
-                    <Trash2 />
-                  </IconButton>
-                </TableCell>
+        <Box sx={{ width: "100%", overflowX: "auto" }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Data</TableCell>
+                <TableCell>Membro</TableCell>
+                <TableCell>Total</TableCell>
+                <TableCell></TableCell>
               </TableRow>
-            )) ?? null}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {productionLogs?.map((log) => (
+                <TableRow
+                  key={log.id}
+                  onClick={() => navigate(`edit/${log.id}`)}
+                  sx={{
+                    cursor: "pointer",
+                    ":hover": { backgroundColor: "#f8f8f8" },
+                  }}
+                >
+                  <TableCell sx={{ width: "33%" }}>
+                    {log.date.toLocaleDateString()}
+                  </TableCell>
+                  <TableCell sx={{ width: "33%" }}>{log.member.name}</TableCell>
+                  <TableCell sx={{ width: "33%" }}>
+                    {formatCurrency(
+                      sum(
+                        log.productionEntries.map(
+                          (entry) => entry.quantity * entry.price,
+                        ),
+                      ),
+                    )}
+                  </TableCell>
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <IconButton
+                      sx={{ color: "red" }}
+                      onClick={() => handleDeleteLog(log.id)}
+                    >
+                      <Trash2 />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              )) ?? null}
+            </TableBody>
+          </Table>
+        </Box>
       </Card>
     </S.Container>
   );

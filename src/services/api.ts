@@ -6,6 +6,7 @@ import { ProductPrice } from "../models/productPrice";
 import { mapToSale, Sale } from "../models/sale";
 import { NewProduction } from "../pages/(protected)/pages/production/new";
 import { NewSale } from "../pages/(protected)/pages/sales/new";
+import { NewUser, User } from "../models/user";
 
 const api = axios.create({ baseURL: import.meta.env.VITE_API_URL });
 
@@ -144,4 +145,42 @@ export async function deleteProductionLog(token: string, id: number | string) {
   return api.delete(`productionLog/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
+}
+
+export async function getUsers(token: string) {
+  return (
+    await api.get("users", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+  ).data as User[];
+}
+
+export async function deleteUser(token: string, id: number | string) {
+  return api.delete(`users/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function createUser(token: string, user: NewUser) {
+  return (
+    await api.post("users", user, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+  ).data;
+}
+
+export async function updateUser(token: string, id: number, user: NewUser) {
+  return (
+    await api.patch(`users/${id}`, user, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+  ).data;
+}
+
+export async function getUserById(token: string, id: number) {
+  return (
+    await api.get(`users/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+  ).data as User;
 }

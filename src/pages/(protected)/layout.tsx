@@ -6,7 +6,12 @@ import * as S from "./styles";
 export default function MainLayout() {
   return (
     <S.Container>
-      <Box sx={{ width: "250px" }}>
+      <Box
+        sx={{
+          width: { xs: 0, sm: "250px" },
+          display: { xs: "none", sm: "block" },
+        }}
+      >
         <SideMenu />
       </Box>
       <Outlet />

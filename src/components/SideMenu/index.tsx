@@ -1,4 +1,11 @@
-import { LuFileText, LuLogOut, LuMilk } from "react-icons/lu";
+import {
+  LuFileText,
+  LuLeaf,
+  LuLogOut,
+  LuMilk,
+  LuUser,
+  LuLayoutDashboard,
+} from "react-icons/lu";
 import { Link } from "react-router";
 import { useAppDispatch, userActions } from "../../store";
 import * as S from "./styles";
@@ -9,9 +16,33 @@ export default function SideMenu() {
     <S.MenuContainer>
       <S.ContentContainer>
         <S.TitleContainer>
-          <Link to="/">AgroGestor</Link>
+          <Link
+            to="/"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              textDecoration: "none",
+            }}
+          >
+            <LuLeaf size={24} color="#10B981" />
+            <span
+              style={{
+                fontWeight: "bold",
+                color: "#10B981",
+                fontSize: "1.1rem",
+              }}
+            >
+              AgroGestor
+            </span>
+          </Link>
         </S.TitleContainer>
+
         <S.ItensContainer>
+          <S.MenuItem to="/">
+            <LuLayoutDashboard color="#1E293B" />
+            Dashboard
+          </S.MenuItem>
           <S.MenuItem to="/vendas">
             <LuFileText color="#1E293B" />
             Vendas
@@ -19,6 +50,10 @@ export default function SideMenu() {
           <S.MenuItem to="/producao">
             <LuMilk color="#1E293B" />
             Produção
+          </S.MenuItem>
+          <S.MenuItem to="/usuarios">
+            <LuUser color="#1E293B" />
+            Usuários
           </S.MenuItem>
         </S.ItensContainer>
       </S.ContentContainer>
