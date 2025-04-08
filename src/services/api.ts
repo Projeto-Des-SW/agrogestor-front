@@ -1,10 +1,10 @@
 import axios from "axios";
 import { Group } from "../models/group";
 import { Member } from "../models/member";
-import { ProductionLog } from "../models/productionLog";
+import { mapToProductionLog, ProductionLog } from "../models/productionLog";
 import { ProductPrice } from "../models/productPrice";
 import { mapToSale, Sale } from "../models/sale";
-import { ProductionLogPayload } from "../pages/(protected)/pages/production/new";
+import { NewProduction } from "../pages/(protected)/pages/production/new";
 import { NewSale } from "../pages/(protected)/pages/sales/new";
 
 const api = axios.create({ baseURL: import.meta.env.VITE_API_URL });
@@ -34,7 +34,7 @@ export async function getSale(token: string, id: number | string) {
       await api.get(`sales/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-    ).data
+    ).data,
   );
 }
 
@@ -45,14 +45,14 @@ export async function getSales(
     groupId?: number;
     startDate?: Date;
     endDate?: Date;
-  }
+  },
 ) {
   return (
     await api.get("sales", {
       headers: { Authorization: `Bearer ${token}` },
       params,
     })
-  ).data.map((e: Sale) => mapToSale(e)) as Sale[];
+  ).data.map(mapToSale) as Sale[];
 }
 
 export async function getProducts(token: string) {
@@ -63,7 +63,7 @@ export async function getProducts(token: string) {
 
 export async function getProductPrice(
   token: string,
-  params: { product: string; date: Date; memberName: string }
+  params: { product: string; date: Date; memberName: string },
 ) {
   return (
     await api.get("prices", {
@@ -82,11 +82,24 @@ export async function postSale(token: string, sale: NewSale) {
 export async function patchSale(
   token: string,
   id: number | string,
-  sale: NewSale
+  sale: NewSale,
 ) {
   return api.patch(`sales/${id}`, sale, {
     headers: { Authorization: `Bearer ${token}` },
   });
+}
+
+export async function getProductionLog(
+  token: string,
+  id: number | string,
+): Promise<ProductionLog> {
+  return mapToProductionLog(
+    (
+      await api.get(`productionLog/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+    ).data,
+  );
 }
 
 export async function getProductionLogs(
@@ -95,25 +108,28 @@ export async function getProductionLogs(
     memberId?: number;
     startDate?: Date;
     endDate?: Date;
-  }
+  },
 ): Promise<ProductionLog[]> {
   return (
     await api.get("productionLog", {
       headers: { Authorization: `Bearer ${token}` },
-      params: {
-        ...params,
-        startDate: params.startDate?.toISOString(),
-        endDate: params.endDate?.toISOString(),
-      },
+      params,
     })
-  ).data;
+  ).data.map(mapToProductionLog);
 }
 
-export async function postProductionLog(
-  token: string,
-  log: ProductionLogPayload
-) {
+export async function postProductionLog(token: string, log: NewProduction) {
   return api.post("productionLog", log, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function patchProductionLog(
+  token: string,
+  id: number | string,
+  log: NewProduction,
+) {
+  return api.patch(`productionLog/${id}`, log, {
     headers: { Authorization: `Bearer ${token}` },
   });
 }
@@ -124,7 +140,7 @@ export async function deleteSale(token: string, id: number | string) {
   });
 }
 
-export async function deleteProductionLog(token: string, id: number) {
+export async function deleteProductionLog(token: string, id: number | string) {
   return api.delete(`productionLog/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });

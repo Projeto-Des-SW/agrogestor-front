@@ -1,5 +1,6 @@
 import {
   Card,
+  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -10,10 +11,13 @@ import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { sum } from "lodash-es";
+import { Trash2 } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import Button from "../../../../components/Button";
 import { useAuth } from "../../../../hooks/useAuth";
+import { ProductionLog } from "../../../../models/productionLog";
 import {
   deleteProductionLog,
   getMembers,
@@ -21,44 +25,36 @@ import {
 } from "../../../../services/api";
 import { formatCurrency } from "../../../../util/formatCurrency";
 import * as S from "../styles";
-import { Trash2 } from "lucide-react";
-import { ProductionLog } from "../../../../models/productionLog";
 
 export default function Production() {
   const { token } = useAuth();
-
+  const navigate = useNavigate();
   const [memberFilter, setMemberFilter] = useState<number>();
   const [groupFilter, setGroupFilter] = useState<number>();
   const [startDateFilter, setStartDateFilter] = useState<Date>();
   const [endDateFilter, setEndDateFilter] = useState<Date>();
-
+  const queryClient = useQueryClient();
   const filters = {
     memberId: memberFilter,
     groupId: groupFilter,
     startDate: startDateFilter,
     endDate: endDateFilter,
   };
-
   const { data: members } = useQuery({
     queryKey: ["members"],
     queryFn: () => getMembers(token!),
   });
-
   const groups = Array.from(
-    new Map(members?.map((member) => [member.group.id, member.group])).values()
+    new Map(members?.map((member) => [member.group.id, member.group])).values(),
   );
-
   const { data: productionLogs } = useQuery<ProductionLog[]>({
-    queryKey: ["productionLogs", filters],
+    queryKey: ["productionLog", filters],
     queryFn: () => getProductionLogs(token!, filters),
   });
-
-  const queryClient = useQueryClient();
-
   const deleteLogMutation = useMutation({
     mutationFn: (id: number) => deleteProductionLog(token!, id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["productionLogs", filters] });
+      queryClient.invalidateQueries({ queryKey: ["productionLog"] });
     },
   });
 
@@ -72,7 +68,7 @@ export default function Production() {
     <S.Container>
       <S.Header>
         <h1>Produção</h1>
-        <Button as={Link} to="new">
+        <Button as={Link} to="new" variant="dark">
           Novo Registro
         </Button>
       </S.Header>
@@ -101,11 +97,7 @@ export default function Production() {
               disableClearable
               defaultValue={{ name: "Todos os membros", id: undefined }}
               renderInput={(params) => (
-                <TextField
-                  sx={{ border: "none" }}
-                  {...params}
-                  label="Filtrar membros"
-                />
+                <TextField {...params} label="Filtrar membros" />
               )}
             />
             <Autocomplete
@@ -121,11 +113,7 @@ export default function Production() {
               disableClearable
               defaultValue={{ name: "Todos os grupos", id: undefined }}
               renderInput={(params) => (
-                <TextField
-                  sx={{ border: "none" }}
-                  {...params}
-                  label="Filtrar grupos"
-                />
+                <TextField {...params} label="Filtrar grupos" />
               )}
             />
             <DatePicker
@@ -146,26 +134,40 @@ export default function Production() {
             <TableRow>
               <TableCell>Data</TableCell>
               <TableCell>Membro</TableCell>
-              <TableCell>Turno</TableCell>
-              <TableCell>Quantidade</TableCell>
-              <TableCell>Valor Total</TableCell>
+              <TableCell>Total</TableCell>
               <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {productionLogs?.map((log) => (
-              <TableRow key={log.id}>
-                <TableCell>
-                  {new Date(log.date).toLocaleDateString()}
+              <TableRow
+                key={log.id}
+                onClick={() => navigate(`edit/${log.id}`)}
+                sx={{
+                  cursor: "pointer",
+                  ":hover": { backgroundColor: "#f8f8f8" },
+                }}
+              >
+                <TableCell sx={{ width: "33%" }}>
+                  {log.date.toLocaleDateString()}
                 </TableCell>
-                <TableCell>{log.member.name}</TableCell>
-                <TableCell>{log.shift}</TableCell>
-                <TableCell>{log.quantity}</TableCell>
-                <TableCell>{formatCurrency(log.quantity * 30)}</TableCell>
-                <TableCell>
-                  <Button variant="ghost" onClick={() => handleDeleteLog(log.id)}>
+                <TableCell sx={{ width: "33%" }}>{log.member.name}</TableCell>
+                <TableCell sx={{ width: "33%" }}>
+                  {formatCurrency(
+                    sum(
+                      log.productionEntries.map(
+                        (entry) => entry.quantity * entry.price,
+                      ),
+                    ),
+                  )}
+                </TableCell>
+                <TableCell onClick={(e) => e.stopPropagation()}>
+                  <IconButton
+                    sx={{ color: "red" }}
+                    onClick={() => handleDeleteLog(log.id)}
+                  >
                     <Trash2 />
-                  </Button>
+                  </IconButton>
                 </TableCell>
               </TableRow>
             )) ?? null}

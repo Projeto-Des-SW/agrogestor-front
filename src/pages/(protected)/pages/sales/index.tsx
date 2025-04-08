@@ -46,12 +46,18 @@ export default function Sales() {
     queryKey: ["sales", filters],
     queryFn: () => getSales(token!, filters),
   });
-  const { mutate: del } = useMutation({
+  const deleteSaleMutation = useMutation({
     mutationFn: (id: number) => deleteSale(token!, id),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["sales"] });
     },
   });
+
+  function handleDeleteSale(id: number) {
+    if (confirm("Tem certeza que deseja excluir este registro de produção?")) {
+      deleteSaleMutation.mutate(id);
+    }
+  }
 
   return (
     <S.Container>
@@ -121,8 +127,8 @@ export default function Sales() {
           <TableHead>
             <TableRow>
               <TableCell>Data</TableCell>
-              <TableCell>Cliente</TableCell>
-              <TableCell>Valor</TableCell>
+              <TableCell>membro</TableCell>
+              <TableCell>Total</TableCell>
               <TableCell></TableCell>
             </TableRow>
           </TableHead>
@@ -144,8 +150,7 @@ export default function Sales() {
                   {formatCurrency(
                     sum(
                       sale.saleItems.map(
-                        (item) =>
-                          item.quantity * Number(item.productPrice.price),
+                        (item) => item.quantity * item.productPrice.price,
                       ),
                     ),
                   )}
@@ -153,7 +158,7 @@ export default function Sales() {
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <IconButton
                     sx={{ color: "red" }}
-                    onClick={() => del(sale.id)}
+                    onClick={() => handleDeleteSale(sale.id)}
                   >
                     <Trash2 />
                   </IconButton>

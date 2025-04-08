@@ -57,8 +57,9 @@ export default function NewSale() {
     queryFn: () => getProducts(token!),
   });
   const { data: fetchedSale } = useQuery({
-    queryKey: ["sale", id],
-    queryFn: () => (id ? getSale(token!, id) : undefined),
+    queryKey: ["sales", id],
+    queryFn: () => getSale(token!, id!),
+    enabled: !!id,
   });
   const [sale, setSale] = useImmer<NewSale>({
     memberName: null,
@@ -87,7 +88,7 @@ export default function NewSale() {
     mutationFn: (sale: NewSale) =>
       id ? patchSale(token!, id, sale) : postSale(token!, sale),
     onSettled: () => {
-      navigate("..");
+      navigate("/vendas");
     },
   });
 

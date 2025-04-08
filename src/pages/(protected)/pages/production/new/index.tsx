@@ -1,175 +1,299 @@
 import {
   Autocomplete,
+  Box,
   Card,
-  MenuItem,
+  createFilterOptions,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import dayjs from "dayjs";
+import { sum } from "lodash-es";
+import { Trash2 } from "lucide-react";
+import { useEffect } from "react";
+import { Link, useNavigate, useParams } from "react-router";
+import { useImmer } from "use-immer";
 import Button from "../../../../../components/Button";
 import { useAuth } from "../../../../../hooks/useAuth";
+import { ProductionLogPeriod } from "../../../../../models/productionEntry";
 import {
   getMembers,
+  getProductionLog,
+  patchProductionLog,
   postProductionLog,
 } from "../../../../../services/api";
+import { formatCurrency } from "../../../../../util/formatCurrency";
 import * as S from "../../styles";
 
-interface Member {
-  id: number;
-  name: string;
-}
-
-export type ProductionLogFormState = {
-  date: Date;
-  memberName: string;
-  period: "MORNING" | "AFTERNOON" | "NIGHT";
-  quantity: number;
-  price: number;
+export type NewProduction = {
+  memberName: string | null;
+  date?: Date;
+  entries: {
+    date: Date;
+    quantity: number;
+    price: number;
+    period: ProductionLogPeriod;
+  }[];
 };
 
 export default function NewProduction() {
   const { token } = useAuth();
   const navigate = useNavigate();
-
-  const { data: members } = useQuery<Member[]>({
+  const { id } = useParams();
+  const { data: members } = useQuery({
     queryKey: ["members"],
     queryFn: () => getMembers(token!),
   });
-
-  const [log, setLog] = useState<ProductionLogFormState>({
+  const { data: fetchedProduction } = useQuery({
+    queryKey: ["productionLog", id],
+    queryFn: () => getProductionLog(token!, id!),
+    enabled: !!id,
+  });
+  const [production, setProduction] = useImmer<NewProduction>({
+    memberName: null,
     date: new Date(),
-    memberName: "",
-    period: "MORNING",
-    quantity: 0,
-    price: 0,
+    entries: [],
+  });
+  const { mutate: submit } = useMutation({
+    mutationFn: (production: NewProduction) =>
+      id
+        ? patchProductionLog(token!, id, production)
+        : postProductionLog(token!, production),
+    onSettled: () => {
+      navigate("/producao");
+    },
   });
 
-  const { mutate: submit } = useMutation({
-    mutationFn: (log: ProductionLogFormState) =>
-      postProductionLog(token!, {
-        date: log.date, 
-        memberName: log.memberName,
-        entries: [
-          {
-            date: log.date, 
-            quantity: log.quantity,
-            price: log.price,
-            period: log.period,
-          },
-        ],
-      }),
-    onSuccess: () => navigate("/producao"),
-  });
-  
+  useEffect(() => {
+    if (fetchedProduction)
+      setProduction({
+        memberName: fetchedProduction.member.name,
+        date: fetchedProduction.date,
+        entries: fetchedProduction.productionEntries,
+      });
+  }, [fetchedProduction, setProduction]);
+
+  const saveDisabled =
+    !production.memberName ||
+    !production.entries.length ||
+    production.entries.some((e) => !e.quantity);
+
+  console.log(production);
 
   return (
     <S.Container>
       <S.Header>
-        <h1>Novo Registro de Produção</h1>
-        <Button as={Link} to="/producao">
+        <h1>Produção</h1>
+        <Button as={Link} to="/producao" variant="dark">
           Voltar
         </Button>
       </S.Header>
-
       <Card
         sx={{
           padding: "25px",
           gap: "16px",
           display: "flex",
           flexDirection: "column",
-          maxWidth: 500,
         }}
       >
-        <S.Title>Novo Registro</S.Title>
+        <S.Title>Novo Registro de Produção</S.Title>
+        <S.MemberAndDate>
+          <Autocomplete
+            sx={{ width: "100%" }}
+            size="small"
+            onChange={(_, value) =>
+              setProduction((draft) => {
+                draft.memberName = value || "";
+              })
+            }
+            options={members?.map((member) => member.name) || []}
+            filterOptions={(options, params) => {
+              const filter = createFilterOptions<string>();
+              const filtered = filter(options, params);
 
-        <Autocomplete
-          sx={{ width: "100%" }}
-          size="small"
-          onChange={(_, value: Member | null) =>
-            setLog((prev) => ({
-              ...prev,
-              memberName: value?.name ?? "",
-            }))
-          }
-          getOptionLabel={(option) => option.name}
-          options={members ?? []}
-          renderInput={(params) => (
-            <TextField {...params} label="Membro" />
-          )}
-        />
+              const { inputValue } = params;
 
-        <TextField
-          label="Data"
-          size="small"
-          type="date"
-          value={log.date.toISOString().split("T")[0]}
-          onChange={(e) =>
-            setLog((prev) => ({
-              ...prev,
-              date: new Date(e.target.value),
-            }))
-          }
-        />
-
-        <TextField
-          label="Período"
-          size="small"
-          select
-          value={log.period}
-          onChange={(e) =>
-            setLog((prev) => ({
-              ...prev,
-              period: e.target.value as "MORNING" | "AFTERNOON" | "NIGHT",
-            }))
-          }
-        >
-          <MenuItem value="MORNING">Manhã</MenuItem>
-          <MenuItem value="AFTERNOON">Tarde</MenuItem>
-          <MenuItem value="NIGHT">Noite</MenuItem>
-        </TextField>
-
-        <TextField
-          label="Quantidade"
-          size="small"
-          type="number"
-          value={log.quantity}
-          onChange={(e) =>
-            setLog((prev) => ({
-              ...prev,
-              quantity: Number(e.target.value),
-            }))
-          }
-        />
-
-        <TextField
-          label="Preço unitário"
-          size="small"
-          type="number"
-          value={log.price}
-          onChange={(e) =>
-            setLog((prev) => ({
-              ...prev,
-              price: Number(e.target.value),
-            }))
-          }
-        />
-
-        <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
-          <Button as={Link} to="/producao">
-            Cancelar
-          </Button>
-          <Button
-            onClick={() => {
-              if (!log.memberName) return alert("Selecione um membro.");
-              if (log.quantity <= 0) return alert("Informe uma quantidade válida.");
-              if (log.price <= 0) return alert("Informe um preço válido.");
-              submit(log);
+              const isExisting = options.some(
+                (option) => inputValue === option,
+              );
+              if (inputValue !== "" && !isExisting) {
+                filtered.push(inputValue);
+              }
+              return filtered;
             }}
+            freeSolo
+            autoSelect
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Membro"
+                error={!production.memberName}
+              />
+            )}
+            value={production.memberName}
+          />
+          <DatePicker
+            label="Data"
+            slotProps={{ textField: { size: "small" } }}
+            onChange={(date) =>
+              setProduction((draft) => {
+                draft.date = date?.toDate();
+              })
+            }
+            defaultValue={dayjs(production.date)}
+          />
+        </S.MemberAndDate>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Data</TableCell>
+              <TableCell>Turno</TableCell>
+              <TableCell>Quantidade</TableCell>
+              <TableCell>Preço</TableCell>
+              <TableCell>Total</TableCell>
+              <TableCell />
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {production.entries.map((entry, index) => (
+              <TableRow key={index}>
+                <TableCell sx={{ width: "20%" }}>
+                  <DatePicker
+                    label="Data"
+                    sx={{ width: "100%" }}
+                    slotProps={{ textField: { size: "small" } }}
+                    onChange={(date) =>
+                      setProduction((draft) => {
+                        draft.entries[index].date = date!.toDate();
+                      })
+                    }
+                    defaultValue={dayjs(production.entries[index].date)}
+                  />
+                </TableCell>
+                <TableCell sx={{ width: "10%" }}>
+                  <ToggleButtonGroup
+                    onChange={(_, value) =>
+                      setProduction((draft) => {
+                        draft.entries[index].period =
+                          value || draft.entries[index].period;
+                      })
+                    }
+                    value={entry.period}
+                    exclusive
+                  >
+                    <ToggleButton value={ProductionLogPeriod.MORNING}>
+                      Manhã
+                    </ToggleButton>
+                    <ToggleButton value={ProductionLogPeriod.AFTERNOON}>
+                      Tarde
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+                </TableCell>
+                <TableCell sx={{ width: "30%" }}>
+                  <TextField
+                    sx={{ width: "100%" }}
+                    type="number"
+                    size="small"
+                    label="Quantidade"
+                    value={entry.quantity}
+                    onChange={(event) => {
+                      setProduction((draft) => {
+                        draft.entries[index].quantity = Math.max(
+                          0,
+                          Number(event.target.value),
+                        );
+                      });
+                    }}
+                    onWheel={(event) => {
+                      (event.target as HTMLInputElement).blur();
+                    }}
+                    error={!entry.quantity}
+                  />
+                </TableCell>
+                <TableCell sx={{ width: "30%" }}>
+                  <TextField
+                    type="number"
+                    size="small"
+                    label="Preço"
+                    value={entry.price}
+                    onChange={(event) => {
+                      setProduction((draft) => {
+                        draft.entries[index].price = Math.max(
+                          0,
+                          Number(event.target.value),
+                        );
+                      });
+                    }}
+                    onWheel={(event) => {
+                      (event.target as HTMLInputElement).blur();
+                    }}
+                  />
+                </TableCell>
+                <TableCell sx={{ fontSize: 20 }}>
+                  {formatCurrency(entry.price * entry.quantity)}
+                </TableCell>
+                <TableCell>
+                  <IconButton
+                    sx={{ color: "red" }}
+                    onClick={() =>
+                      setProduction((draft) => {
+                        draft.entries = draft.entries.filter(
+                          (_, i) => i !== index,
+                        );
+                      })
+                    }
+                  >
+                    <Trash2 />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        <Box sx={{ justifyContent: "center", display: "flex" }}>
+          <Button
+            onClick={() =>
+              setProduction((draft) => {
+                draft.entries.push({
+                  date: new Date(),
+                  price: 0,
+                  quantity: 0,
+                  period: ProductionLogPeriod.MORNING,
+                });
+              })
+            }
           >
-            Salvar
+            Adicionar entrada
           </Button>
-        </div>
+        </Box>
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <h2>
+            Total:{" "}
+            {formatCurrency(
+              sum(production.entries.map((e) => e.price * e.quantity)),
+            )}
+          </h2>
+          <Box sx={{ display: "flex", gap: "10px" }}>
+            <Button variant="red" as={Link} to="/producao">
+              Cancelar
+            </Button>
+            <Button
+              disabled={saveDisabled}
+              onClick={() => submit(production)}
+              variant={saveDisabled ? "gray" : undefined}
+            >
+              Salvar
+            </Button>
+          </Box>
+        </Box>
       </Card>
     </S.Container>
   );
