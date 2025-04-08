@@ -20,7 +20,6 @@ export const Header = styled.header`
   }
 
   a {
-    background-color: #1e293b;
     text-decoration: none;
 
     &:hover {
@@ -52,4 +51,5 @@ export const Filters = styled.div`
 export const MemberAndDate = styled.div`
   display: flex;
   justify-content: stretch;
+  gap: 20px;
 `;

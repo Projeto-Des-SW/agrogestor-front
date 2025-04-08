@@ -26,6 +26,16 @@ export async function getGroups(token: string) {
   ).data as Group[];
 }
 
+export async function getSale(token: string, id: number | string) {
+  return mapToSale(
+    (
+      await api.get(`sales/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+    ).data,
+  );
+}
+
 export async function getSales(
   token: string,
   params: {
@@ -63,6 +73,22 @@ export async function getProductPrice(
 
 export async function postSale(token: string, sale: NewSale) {
   return api.post("sales", sale, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function patchSale(
+  token: string,
+  id: number | string,
+  sale: NewSale,
+) {
+  return api.patch(`sales/${id}`, sale, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function deleteSale(token: string, id: number | string) {
+  return api.delete(`sales/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 }

@@ -1,7 +1,9 @@
 import {
   Autocomplete,
+  Box,
   Card,
   createFilterOptions,
+  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -9,10 +11,13 @@ import {
   TableRow,
   TextField,
 } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
+import dayjs from "dayjs";
 import { sum } from "lodash-es";
+import { Trash2 } from "lucide-react";
 import { useEffect } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import { useImmer } from "use-immer";
 import Button from "../../../../../components/Button";
 import { useAuth } from "../../../../../hooks/useAuth";
@@ -20,13 +25,15 @@ import {
   getMembers,
   getProductPrice,
   getProducts,
+  getSale,
+  patchSale,
   postSale,
 } from "../../../../../services/api";
 import { formatCurrency } from "../../../../../util/formatCurrency";
 import * as S from "../../styles";
 
 export type NewSale = {
-  memberName?: string;
+  memberName: string | null;
   date?: Date;
   items: {
     date: Date;
@@ -37,11 +44,10 @@ export type NewSale = {
   }[];
 };
 
-const filter =
-  createFilterOptions<Awaited<ReturnType<typeof getMembers>>[number]>();
-
 export default function NewSale() {
   const { token } = useAuth();
+  const navigate = useNavigate();
+  const { id } = useParams();
   const { data: members } = useQuery({
     queryKey: ["members"],
     queryFn: () => getMembers(token!),
@@ -50,8 +56,12 @@ export default function NewSale() {
     queryKey: ["products"],
     queryFn: () => getProducts(token!),
   });
+  const { data: fetchedSale } = useQuery({
+    queryKey: ["sale", id],
+    queryFn: () => (id ? getSale(token!, id) : undefined),
+  });
   const [sale, setSale] = useImmer<NewSale>({
-    memberName: undefined,
+    memberName: null,
     date: new Date(),
     items: [],
   });
@@ -74,7 +84,11 @@ export default function NewSale() {
     })),
   }).map((e) => e.data);
   const { mutate: submit } = useMutation({
-    mutationFn: (sale: NewSale) => postSale(token!, sale),
+    mutationFn: (sale: NewSale) =>
+      id ? patchSale(token!, id, sale) : postSale(token!, sale),
+    onSettled: () => {
+      navigate("..");
+    },
   });
 
   useEffect(() => {
@@ -87,16 +101,30 @@ export default function NewSale() {
   }, [productPrices, setSale]);
 
   useEffect(() => {
-    setSale((draft) => {
-      draft.memberName = members?.[0]?.name;
-    });
-  }, [members, setSale]);
+    if (fetchedSale)
+      setSale({
+        memberName: fetchedSale.member.name,
+        date: fetchedSale.date,
+        items: fetchedSale.saleItems.map((item) => ({
+          date: item.productPrice.date,
+          quantity: item.quantity,
+          price: item.productPrice.price,
+          productName: item.productPrice.product.name,
+          hasUserChangedPrice: true,
+        })),
+      });
+  }, [fetchedSale, setSale]);
+
+  const saveDisabled =
+    !sale.memberName ||
+    !sale.items.length ||
+    sale.items.some((e) => !e.productName || !e.quantity);
 
   return (
     <S.Container>
       <S.Header>
         <h1>Nova Venda</h1>
-        <Button as={Link} to="/vendas">
+        <Button as={Link} to="/vendas" variant="dark">
           Voltar
         </Button>
       </S.Header>
@@ -111,55 +139,44 @@ export default function NewSale() {
         <S.Title>Nova Venda</S.Title>
         <S.MemberAndDate>
           <Autocomplete
-            sx={{ width: 300 }}
+            sx={{ width: "100%" }}
             size="small"
             onChange={(_, value) =>
               setSale((draft) => {
-                draft.memberName =
-                  typeof value === "string" ? value : value?.name;
+                draft.memberName = value || "";
               })
             }
-            getOptionLabel={(option) =>
-              typeof option === "string" ? option : option.name
-            }
-            options={members ?? []}
+            options={members?.map((member) => member.name) || []}
             filterOptions={(options, params) => {
+              const filter = createFilterOptions<string>();
               const filtered = filter(options, params);
 
               const { inputValue } = params;
 
               const isExisting = options.some(
-                (option) => inputValue === option.name,
+                (option) => inputValue === option,
               );
               if (inputValue !== "" && !isExisting) {
-                filtered.push({
-                  id: 0,
-                  disabled: false,
-                  groupId: 0,
-                  name: inputValue,
-                  group: {
-                    disabled: false,
-                    id: 0,
-                    name: "",
-                  },
-                });
+                filtered.push(inputValue);
               }
               return filtered;
             }}
-            autoSelect
             freeSolo
+            autoSelect
             renderInput={(params) => (
-              <TextField sx={{ border: "none" }} {...params} label="Membro" />
+              <TextField {...params} label="Membro" error={!sale.memberName} />
             )}
+            value={sale.memberName}
           />
-          <input
-            type="date"
-            value={sale.date?.toISOString().split("T")[0]}
-            onChange={({ target: { value } }) =>
+          <DatePicker
+            label="Data"
+            slotProps={{ textField: { size: "small" } }}
+            onChange={(date) =>
               setSale((draft) => {
-                draft.date = value === "" ? undefined : new Date(value);
+                draft.date = date?.toDate();
               })
             }
+            defaultValue={dayjs(sale.date)}
           />
         </S.MemberAndDate>
         <Table>
@@ -176,95 +193,158 @@ export default function NewSale() {
           <TableBody>
             {sale.items.map((item, index) => (
               <TableRow key={index}>
-                <TableCell>
-                  <input
-                    onChange={({ target: { value } }) =>
+                <TableCell sx={{ width: "20%" }}>
+                  <DatePicker
+                    label="Data"
+                    sx={{ width: "100%" }}
+                    slotProps={{ textField: { size: "small" } }}
+                    onChange={(date) =>
                       setSale((draft) => {
-                        draft.items[index].date = new Date(value);
+                        draft.items[index].date = date!.toDate();
                         draft.items[index].hasUserChangedPrice = false;
                       })
                     }
-                    type="date"
-                    value={item.date.toISOString().split("T")[0]}
+                    defaultValue={dayjs(sale.items[index].date)}
                   />
                 </TableCell>
-                <TableCell>
-                  <select
-                    onChange={({ target: { value } }) =>
+                <TableCell sx={{ width: "60%" }}>
+                  <Autocomplete
+                    size="small"
+                    onChange={(_, value) =>
                       setSale((draft) => {
-                        draft.items[index].productName = value;
+                        draft.items[index].productName = value || "";
                         draft.items[index].hasUserChangedPrice = false;
                       })
                     }
-                  >
-                    {products?.map((product) => (
-                      <option key={product}>{product}</option>
-                    )) ?? null}
-                  </select>
+                    options={products || []}
+                    filterOptions={(options, params) => {
+                      const filter = createFilterOptions<string>();
+                      const filtered = filter(options, params);
+
+                      const { inputValue } = params;
+
+                      const isExisting = options.some(
+                        (option) => inputValue === option,
+                      );
+                      if (inputValue !== "" && !isExisting) {
+                        filtered.push(inputValue);
+                      }
+                      return filtered;
+                    }}
+                    freeSolo
+                    autoSelect
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Produto"
+                        error={!item.productName}
+                      />
+                    )}
+                    value={item.productName || ""}
+                  />
                 </TableCell>
-                <TableCell>
-                  <input
-                    onChange={({ target: { value } }) =>
-                      setSale((draft) => {
-                        draft.items[index].quantity = Number(value);
-                      })
-                    }
+                <TableCell sx={{ width: "10%" }}>
+                  <TextField
                     type="number"
+                    size="small"
+                    label="Quantidade"
                     value={item.quantity}
-                    min={0}
+                    onChange={(event) => {
+                      setSale((draft) => {
+                        draft.items[index].quantity = Math.max(
+                          0,
+                          Number(event.target.value),
+                        );
+                      });
+                    }}
+                    onWheel={(event) => {
+                      (event.target as HTMLInputElement).blur();
+                    }}
+                    error={!item.quantity}
                   />
                 </TableCell>
-                <TableCell>
-                  <input
+                <TableCell sx={{ width: "10%" }}>
+                  <TextField
                     type="number"
-                    onChange={({ target: { value } }) =>
-                      setSale((draft) => {
-                        draft.items[index].price = Number(value || 0);
-                        draft.items[index].hasUserChangedPrice = true;
-                      })
-                    }
+                    size="small"
+                    label="Preço"
                     value={
                       item.hasUserChangedPrice
-                        ? item.price.toString()
-                        : (productPrices[index]?.price.toString() ?? "0")
+                        ? item.price
+                        : productPrices[index]?.price || 0
                     }
-                    min={0}
+                    onChange={(event) => {
+                      setSale((draft) => {
+                        draft.items[index].price = Math.max(
+                          0,
+                          Number(event.target.value),
+                        );
+                        draft.items[index].hasUserChangedPrice = true;
+                      });
+                    }}
+                    onWheel={(event) => {
+                      (event.target as HTMLInputElement).blur();
+                    }}
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ fontSize: 20 }}>
                   {formatCurrency(
                     (item.hasUserChangedPrice
                       ? item.price
                       : (productPrices[index]?.price ?? 0)) * item.quantity,
                   )}
                 </TableCell>
+                <TableCell>
+                  <IconButton
+                    sx={{ color: "red" }}
+                    onClick={() =>
+                      setSale((draft) => {
+                        draft.items = draft.items.filter((_, i) => i !== index);
+                      })
+                    }
+                  >
+                    <Trash2 />
+                  </IconButton>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        <Button
-          onClick={() =>
-            setSale((draft) => {
-              draft.items.push({
-                date: new Date(),
-                price: 0,
-                productName: products?.[0] ?? "",
-                quantity: 0,
-                hasUserChangedPrice: false,
-              });
-            })
-          }
-        >
-          Adicionar item
-        </Button>
-        <h2>
-          Total:{" "}
-          {formatCurrency(sum(sale.items.map((e) => e.price * e.quantity)))}
-        </h2>
-        <Button as={Link} to="/vendas">
-          Cancelar
-        </Button>
-        <Button onClick={() => submit(sale)}>Salvar</Button>
+        <Box sx={{ justifyContent: "center", display: "flex" }}>
+          <Button
+            onClick={() =>
+              setSale((draft) => {
+                draft.items.push({
+                  date: new Date(),
+                  price: 0,
+                  productName: products?.[0] ?? "",
+                  quantity: 0,
+                  hasUserChangedPrice: false,
+                });
+              })
+            }
+          >
+            Adicionar item
+          </Button>
+        </Box>
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <h2>
+            Total:{" "}
+            {formatCurrency(sum(sale.items.map((e) => e.price * e.quantity)))}
+          </h2>
+          <Box sx={{ display: "flex", gap: "10px" }}>
+            <Button variant="red" as={Link} to="/vendas">
+              Cancelar
+            </Button>
+            <Button
+              disabled={saveDisabled}
+              onClick={() => submit(sale)}
+              variant={saveDisabled ? "gray" : undefined}
+            >
+              Salvar
+            </Button>
+          </Box>
+        </Box>
       </Card>
     </S.Container>
   );

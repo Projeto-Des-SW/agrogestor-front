@@ -1,5 +1,5 @@
-import styled from "styled-components";
 import { NavLink } from "react-router";
+import styled from "styled-components";
 
 export const ContentContainer = styled.div`
   display: flex;
@@ -14,6 +14,8 @@ export const MenuContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  height: 100%;
+  position: fixed;
 `;
 
 export const TitleContainer = styled.div`

@@ -1,5 +1,6 @@
 import {
   Card,
+  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -9,23 +10,25 @@ import {
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { sum } from "lodash-es";
-import { Badge, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import Button from "../../../../components/Button";
 import { useAuth } from "../../../../hooks/useAuth";
-import { getMembers, getSales } from "../../../../services/api";
+import { deleteSale, getMembers, getSales } from "../../../../services/api";
 import { formatCurrency } from "../../../../util/formatCurrency";
 import * as S from "../styles";
 
 export default function Sales() {
   const { token } = useAuth();
+  const navigate = useNavigate();
   const [memberFilter, setMemberFilter] = useState<number>();
   const [groupFilter, setGroupFilter] = useState<number>();
   const [startDateFilter, setStartDateFilter] = useState<Date>();
   const [endDateFilter, setEndDateFilter] = useState<Date>();
+  const queryClient = useQueryClient();
   const filters = {
     memberId: memberFilter,
     groupId: groupFilter,
@@ -43,12 +46,18 @@ export default function Sales() {
     queryKey: ["sales", filters],
     queryFn: () => getSales(token!, filters),
   });
+  const { mutate: del } = useMutation({
+    mutationFn: (id: number) => deleteSale(token!, id),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["sales"] });
+    },
+  });
 
   return (
     <S.Container>
       <S.Header>
         <h1>Vendas</h1>
-        <Button as={Link} to="new">
+        <Button as={Link} to="new" variant="dark">
           Nova Venda
         </Button>
       </S.Header>
@@ -77,11 +86,7 @@ export default function Sales() {
               disableClearable
               defaultValue={{ name: "Todos os membros", id: undefined }}
               renderInput={(params) => (
-                <TextField
-                  sx={{ border: "none" }}
-                  {...params}
-                  label="Filtrar membros"
-                />
+                <TextField {...params} label="Filtrar membros" />
               )}
             />
             <Autocomplete
@@ -97,11 +102,7 @@ export default function Sales() {
               disableClearable
               defaultValue={{ name: "Todos os grupos", id: undefined }}
               renderInput={(params) => (
-                <TextField
-                  sx={{ border: "none" }}
-                  {...params}
-                  label="Filtrar grupos"
-                />
+                <TextField {...params} label="Filtrar grupos" />
               )}
             />
             <DatePicker
@@ -127,13 +128,19 @@ export default function Sales() {
           </TableHead>
           <TableBody>
             {sales?.map((sale) => (
-              <TableRow key={sale.id}>
-                <TableCell>{sale.date.toLocaleDateString()}</TableCell>
-                <TableCell>{sale.member.name}</TableCell>
-                <TableCell>
-                  <Badge>Leite (10)</Badge>
+              <TableRow
+                key={sale.id}
+                onClick={() => navigate(`edit/${sale.id}`)}
+                sx={{
+                  cursor: "pointer",
+                  ":hover": { backgroundColor: "#f8f8f8" },
+                }}
+              >
+                <TableCell sx={{ width: "33%" }}>
+                  {sale.date.toLocaleDateString()}
                 </TableCell>
-                <TableCell className="right">
+                <TableCell sx={{ width: "33%" }}>{sale.member.name}</TableCell>
+                <TableCell sx={{ width: "33%" }}>
                   {formatCurrency(
                     sum(
                       sale.saleItems.map(
@@ -143,10 +150,13 @@ export default function Sales() {
                     ),
                   )}
                 </TableCell>
-                <TableCell>
-                  <Button variant="ghost">
+                <TableCell onClick={(e) => e.stopPropagation()}>
+                  <IconButton
+                    sx={{ color: "red" }}
+                    onClick={() => del(sale.id)}
+                  >
                     <Trash2 />
-                  </Button>
+                  </IconButton>
                 </TableCell>
               </TableRow>
             )) ?? null}
