@@ -1,8 +1,10 @@
 import axios from "axios";
 import { Group } from "../models/group";
 import { Member } from "../models/member";
+import { ProductionLog } from "../models/productionLog";
 import { ProductPrice } from "../models/productPrice";
 import { mapToSale, Sale } from "../models/sale";
+import { ProductionLogPayload } from "../pages/(protected)/pages/production/new";
 import { NewSale } from "../pages/(protected)/pages/sales/new";
 
 const api = axios.create({ baseURL: import.meta.env.VITE_API_URL });
@@ -32,7 +34,7 @@ export async function getSale(token: string, id: number | string) {
       await api.get(`sales/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-    ).data,
+    ).data
   );
 }
 
@@ -43,7 +45,7 @@ export async function getSales(
     groupId?: number;
     startDate?: Date;
     endDate?: Date;
-  },
+  }
 ) {
   return (
     await api.get("sales", {
@@ -61,7 +63,7 @@ export async function getProducts(token: string) {
 
 export async function getProductPrice(
   token: string,
-  params: { product: string; date: Date; memberName: string },
+  params: { product: string; date: Date; memberName: string }
 ) {
   return (
     await api.get("prices", {
@@ -80,15 +82,50 @@ export async function postSale(token: string, sale: NewSale) {
 export async function patchSale(
   token: string,
   id: number | string,
-  sale: NewSale,
+  sale: NewSale
 ) {
   return api.patch(`sales/${id}`, sale, {
     headers: { Authorization: `Bearer ${token}` },
   });
 }
 
+export async function getProductionLogs(
+  token: string,
+  params: {
+    memberId?: number;
+    startDate?: Date;
+    endDate?: Date;
+  }
+): Promise<ProductionLog[]> {
+  return (
+    await api.get("productionLog", {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        ...params,
+        startDate: params.startDate?.toISOString(),
+        endDate: params.endDate?.toISOString(),
+      },
+    })
+  ).data;
+}
+
+export async function postProductionLog(
+  token: string,
+  log: ProductionLogPayload
+) {
+  return api.post("productionLog", log, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
 export async function deleteSale(token: string, id: number | string) {
   return api.delete(`sales/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function deleteProductionLog(token: string, id: number) {
+  return api.delete(`productionLog/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 }
