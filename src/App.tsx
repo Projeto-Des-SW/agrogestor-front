@@ -6,11 +6,12 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { PersistGate } from "redux-persist/integration/react";
 import ProtectedRoute from "./components/ProtectedRoute";
 import MainLayout from "./pages/(protected)/layout";
-import Production from "./pages/(protected)/pages/Production";
 import Sales from "./pages/(protected)/pages/sales";
 import NewSale from "./pages/(protected)/pages/sales/new";
 import Login from "./pages/login";
 import { persistor, store } from "./store";
+import Production from "./pages/(protected)/pages/production";
+import NewProduction from "./pages/(protected)/pages/production/new";
 
 const queryClient = new QueryClient();
 
@@ -30,7 +31,10 @@ function App() {
                       <Route index element={<Sales />} />
                       <Route path="new" element={<NewSale />} />
                     </Route>
-                    <Route path="producao" element={<Production />} />
+                    <Route path="producao" >
+                      <Route index element={<Production />} />
+                      <Route path="new" element={<NewProduction />} />
+                    </Route>
                   </Route>
                 </Route>
               </Routes>

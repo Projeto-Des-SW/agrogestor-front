@@ -53,3 +53,11 @@ export const MemberAndDate = styled.div`
   display: flex;
   justify-content: stretch;
 `;
+
+
+export const Actions = styled.div`
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 16px;
+`;

@@ -4,6 +4,8 @@ import { Member } from "../models/member";
 import { ProductPrice } from "../models/productPrice";
 import { mapToSale, Sale } from "../models/sale";
 import { NewSale } from "../pages/(protected)/pages/sales/new";
+import { ProductionLogPayload } from "../pages/(protected)/pages/production/new";
+import { ProductionLog } from "../models/productionLog";
 
 const api = axios.create({ baseURL: import.meta.env.VITE_API_URL });
 
@@ -63,6 +65,39 @@ export async function getProductPrice(
 
 export async function postSale(token: string, sale: NewSale) {
   return api.post("sales", sale, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function getProductionLogs(
+  token: string,
+  params: {
+    memberId?: number;
+    startDate?: Date;
+    endDate?: Date;
+  }
+): Promise<ProductionLog[]> {
+  return (
+    await api.get("productionLog", {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        ...params,
+        startDate: params.startDate?.toISOString(),
+        endDate: params.endDate?.toISOString(),
+      },
+    })
+  ).data;
+}
+
+
+export async function postProductionLog(token: string, log: ProductionLogPayload) {
+  return api.post("productionLog", log, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function deleteProductionLog(token: string, id: number) {
+  return api.delete(`productionLog/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 }
