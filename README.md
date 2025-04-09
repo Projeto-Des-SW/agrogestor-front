@@ -15,7 +15,7 @@ https://agrogestor.vercel.app/
 
 # Sobre o Projeto
 
-O **AgroGestor** é uma aplicação web responsiva e simples, desenvolvida em **Node.js**, **NestJS** e **React**, com o objetivo de modernizar a gestão de pequenos produtores rurais.
+O **AgroGestor** é uma aplicação web simples de utilizar, desenvolvida em **Node.js**, **NestJS** e **React**, com o objetivo de modernizar a gestão de pequenos produtores rurais.
 
 O projeto foi idealizado a partir da demanda real de um cliente que realizava o controle de vendas, compras de leite e preços personalizados em **planilhas Excel**, com alto risco de erros e perda de dados.
 
@@ -48,6 +48,7 @@ O sistema possui dois tipos de usuários:
 - [Estudo de Viabilidade](https://docs.google.com/document/d/1se87ChMS0wulKtVhAMbvzzATyeFIBTBxdjCBjMhbeHA/edit?usp=sharing)
 - [TAP](https://docs.google.com/document/d/1XyYxsH_ts6aIiTBbc-8WWjJYTwSGBVuGKmBASS_gD3o/edit?usp=sharing)
 - [Plano de Projeto](https://docs.google.com/document/d/11TMAFIooPQIh7gFymsdcPu6l2xQK1dJXO5Or5i2x7b4/edit?usp=sharing)
+- [Pitch](https://drive.google.com/file/d/1vHg4xI_84TrzGU6Tvf4i906lCnDotH2M/view)
 
 # Tecnologias Usadas
 
