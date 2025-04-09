@@ -8,15 +8,15 @@ import {
   TableRow,
   TextField,
 } from "@mui/material";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Trash2 } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import Button from "../../../../components/Button";
 import { useAuth } from "../../../../hooks/useAuth";
-import { getUsers, deleteUser } from "../../../../services/api";
-import * as S from "../styles";
 import { User } from "../../../../models/user";
-import { useState } from "react";
+import { deleteUser, getUsers } from "../../../../services/api";
+import * as S from "../../pages/styles";
 
 export default function Users() {
   const { token } = useAuth();
@@ -89,12 +89,12 @@ export default function Users() {
           <TableBody>
             {filteredUsers?.map((user) => (
               <TableRow key={user.id}>
-                <TableCell>{user.name}</TableCell>
-                <TableCell>{user.username}</TableCell>
-                <TableCell>
+                <TableCell sx={{ width: "30%" }}>{user.name}</TableCell>
+                <TableCell sx={{ width: "30%" }}>{user.username}</TableCell>
+                <TableCell sx={{ width: "30%" }}>
                   {user.role === "ADMIN" ? "Administrador" : "Usuário"}
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ width: "10%" }}>
                   <IconButton
                     onClick={() => navigate(`/usuarios/edit/${user.id}`)}
                   >

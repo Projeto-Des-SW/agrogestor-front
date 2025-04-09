@@ -1,9 +1,9 @@
-import { Card, Typography, Box, Button } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import LocalDrinkIcon from "@mui/icons-material/LocalDrink";
 import GroupIcon from "@mui/icons-material/Group";
-import { useNavigate } from "react-router-dom";
+import LocalDrinkIcon from "@mui/icons-material/LocalDrink";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import { Box, Button, Card, Typography } from "@mui/material";
+import { useNavigate } from "react-router";
 
 export type DashboardCardProps = {
   title: string;

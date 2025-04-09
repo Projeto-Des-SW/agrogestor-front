@@ -165,7 +165,7 @@ export default function NewSale() {
             freeSolo
             autoSelect
             renderInput={(params) => (
-              <TextField {...params} label="Membro" error={!sale.memberName} />
+              <TextField {...params} label="Cliente" error={!sale.memberName} />
             )}
             value={sale.memberName}
           />
@@ -177,7 +177,7 @@ export default function NewSale() {
                 draft.date = date?.toDate();
               })
             }
-            defaultValue={dayjs(sale.date)}
+            value={dayjs(sale.date)}
           />
         </S.MemberAndDate>
         <Table>

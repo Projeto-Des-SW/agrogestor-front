@@ -12,7 +12,7 @@ import TextField from "@mui/material/TextField";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { sum } from "lodash-es";
-import { Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import Button from "../../../../components/Button";
@@ -53,7 +53,7 @@ export default function Sales() {
     },
   });
 
-  function handleDeleteSale(id: number) {
+  function handleDelete(id: number) {
     if (confirm("Tem certeza que deseja excluir este registro de produção?")) {
       deleteSaleMutation.mutate(id);
     }
@@ -85,14 +85,14 @@ export default function Sales() {
               onChange={(_, value) => setMemberFilter(value?.id)}
               getOptionLabel={(option) => option.name}
               options={[
-                { name: "Todos os membros", id: undefined },
+                { name: "Todos os clientes", id: undefined },
                 ...(members ?? []),
               ]}
               autoSelect
               disableClearable
-              defaultValue={{ name: "Todos os membros", id: undefined }}
+              defaultValue={{ name: "Todos os clientes", id: undefined }}
               renderInput={(params) => (
-                <TextField {...params} label="Filtrar membros" />
+                <TextField {...params} label="Filtrar clientes" />
               )}
             />
             <Autocomplete
@@ -127,26 +127,19 @@ export default function Sales() {
           <TableHead>
             <TableRow>
               <TableCell>Data</TableCell>
-              <TableCell>membro</TableCell>
+              <TableCell>Cliente</TableCell>
               <TableCell>Total</TableCell>
-              <TableCell></TableCell>
+              <TableCell>Ações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {sales?.map((sale) => (
-              <TableRow
-                key={sale.id}
-                onClick={() => navigate(`edit/${sale.id}`)}
-                sx={{
-                  cursor: "pointer",
-                  ":hover": { backgroundColor: "#f8f8f8" },
-                }}
-              >
-                <TableCell sx={{ width: "33%" }}>
+              <TableRow key={sale.id}>
+                <TableCell sx={{ width: "30%" }}>
                   {sale.date.toLocaleDateString()}
                 </TableCell>
-                <TableCell sx={{ width: "33%" }}>{sale.member.name}</TableCell>
-                <TableCell sx={{ width: "33%" }}>
+                <TableCell sx={{ width: "30%" }}>{sale.member.name}</TableCell>
+                <TableCell sx={{ width: "30%" }}>
                   {formatCurrency(
                     sum(
                       sale.saleItems.map(
@@ -155,12 +148,17 @@ export default function Sales() {
                     ),
                   )}
                 </TableCell>
-                <TableCell onClick={(e) => e.stopPropagation()}>
+                <TableCell sx={{ width: "10%" }}>
+                  <IconButton
+                    onClick={() => navigate(`/vendas/edit/${sale.id}`)}
+                  >
+                    <Pencil size={16} />
+                  </IconButton>
                   <IconButton
                     sx={{ color: "red" }}
-                    onClick={() => handleDeleteSale(sale.id)}
+                    onClick={() => handleDelete(sale.id)}
                   >
-                    <Trash2 />
+                    <Trash2 size={16} />
                   </IconButton>
                 </TableCell>
               </TableRow>

@@ -13,7 +13,7 @@ import TextField from "@mui/material/TextField";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { sum } from "lodash-es";
-import { Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import Button from "../../../../components/Button";
@@ -59,7 +59,7 @@ export default function Production() {
     },
   });
 
-  function handleDeleteLog(id: number) {
+  function handleDelete(id: number) {
     if (confirm("Tem certeza que deseja excluir este registro de produção?")) {
       deleteLogMutation.mutate(id);
     }
@@ -91,14 +91,14 @@ export default function Production() {
               onChange={(_, value) => setMemberFilter(value?.id)}
               getOptionLabel={(option) => option.name}
               options={[
-                { name: "Todos os membros", id: undefined },
+                { name: "Todos os clientes", id: undefined },
                 ...(members ?? []),
               ]}
               autoSelect
               disableClearable
-              defaultValue={{ name: "Todos os membros", id: undefined }}
+              defaultValue={{ name: "Todos os clientes", id: undefined }}
               renderInput={(params) => (
-                <TextField {...params} label="Filtrar membros" />
+                <TextField {...params} label="Filtrar clientes" />
               )}
             />
             <Autocomplete
@@ -135,26 +135,19 @@ export default function Production() {
             <TableHead>
               <TableRow>
                 <TableCell>Data</TableCell>
-                <TableCell>Membro</TableCell>
+                <TableCell>Cliente</TableCell>
                 <TableCell>Total</TableCell>
-                <TableCell></TableCell>
+                <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {productionLogs?.map((log) => (
-                <TableRow
-                  key={log.id}
-                  onClick={() => navigate(`edit/${log.id}`)}
-                  sx={{
-                    cursor: "pointer",
-                    ":hover": { backgroundColor: "#f8f8f8" },
-                  }}
-                >
-                  <TableCell sx={{ width: "33%" }}>
+                <TableRow key={log.id}>
+                  <TableCell sx={{ width: "30%" }}>
                     {log.date.toLocaleDateString()}
                   </TableCell>
-                  <TableCell sx={{ width: "33%" }}>{log.member.name}</TableCell>
-                  <TableCell sx={{ width: "33%" }}>
+                  <TableCell sx={{ width: "30%" }}>{log.member.name}</TableCell>
+                  <TableCell sx={{ width: "30%" }}>
                     {formatCurrency(
                       sum(
                         log.productionEntries.map(
@@ -163,12 +156,17 @@ export default function Production() {
                       ),
                     )}
                   </TableCell>
-                  <TableCell onClick={(e) => e.stopPropagation()}>
+                  <TableCell sx={{ width: "10%" }}>
+                    <IconButton
+                      onClick={() => navigate(`/producao/edit/${log.id}`)}
+                    >
+                      <Pencil size={16} />
+                    </IconButton>
                     <IconButton
                       sx={{ color: "red" }}
-                      onClick={() => handleDeleteLog(log.id)}
+                      onClick={() => handleDelete(log.id)}
                     >
-                      <Trash2 />
+                      <Trash2 size={16} />
                     </IconButton>
                   </TableCell>
                 </TableRow>

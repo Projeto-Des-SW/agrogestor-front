@@ -5,7 +5,7 @@ export const PageContainer = styled.div`
   height: 100vh;
   display: flex;
   align-items: center;
-  background: url("/src/assets/images/agro.jpg") no-repeat center center;
+  background: url("agro.jpg") no-repeat center center;
   background-size: cover;
 `;
 

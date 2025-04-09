@@ -7,17 +7,17 @@ import {
 } from "@mui/material";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router";
 import { useImmer } from "use-immer";
-import type { NewUser as NewUserType } from "../../../../../models/user";
 import Button from "../../../../../components/Button";
 import { useAuth } from "../../../../../hooks/useAuth";
+import type { NewUser as NewUserType } from "../../../../../models/user";
 import {
   createUser,
   getUserById,
   updateUser,
 } from "../../../../../services/api";
-import * as S from "../../styles";
+import * as S from "../../../pages/styles";
 
 export default function NewUser() {
   const { token } = useAuth();
@@ -58,7 +58,7 @@ export default function NewUser() {
         ? updateUser(token!, Number(id), payload)
         : createUser(token!, payload);
     },
-    onSuccess: () => navigate("/usuarios"),
+    onSettled: () => navigate("/usuarios"),
   });
 
   const disabled =

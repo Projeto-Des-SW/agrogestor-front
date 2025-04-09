@@ -86,8 +86,6 @@ export default function NewProduction() {
     !production.entries.length ||
     production.entries.some((e) => !e.quantity);
 
-  console.log(production);
-
   return (
     <S.Container>
       <S.Header>
@@ -134,7 +132,7 @@ export default function NewProduction() {
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Membro"
+                label="Cliente"
                 error={!production.memberName}
               />
             )}
@@ -148,7 +146,7 @@ export default function NewProduction() {
                 draft.date = date?.toDate();
               })
             }
-            defaultValue={dayjs(production.date)}
+            value={dayjs(production.date)}
           />
         </S.MemberAndDate>
         <Table>
@@ -156,7 +154,7 @@ export default function NewProduction() {
             <TableRow>
               <TableCell>Data</TableCell>
               <TableCell>Turno</TableCell>
-              <TableCell>Quantidade</TableCell>
+              <TableCell>Litros</TableCell>
               <TableCell>Preço</TableCell>
               <TableCell>Total</TableCell>
               <TableCell />
@@ -202,7 +200,7 @@ export default function NewProduction() {
                     sx={{ width: "100%" }}
                     type="number"
                     size="small"
-                    label="Quantidade"
+                    label="Litros"
                     value={entry.quantity}
                     onChange={(event) => {
                       setProduction((draft) => {

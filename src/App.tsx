@@ -5,16 +5,16 @@ import { Provider } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { PersistGate } from "redux-persist/integration/react";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Users from "./pages/(protected)/(admin)/users";
+import NewUser from "./pages/(protected)/(admin)/users/new";
 import MainLayout from "./pages/(protected)/layout";
+import Home from "./pages/(protected)/pages/home";
 import Production from "./pages/(protected)/pages/production";
 import NewProduction from "./pages/(protected)/pages/production/new";
 import Sales from "./pages/(protected)/pages/sales";
 import NewSale from "./pages/(protected)/pages/sales/new";
 import Login from "./pages/login";
 import { persistor, store } from "./store";
-import Users from "./pages/(protected)/pages/users";
-import NewUser from "./pages/(protected)/pages/users/new";
-import Home from "./pages/(protected)/pages/home";
 
 const queryClient = new QueryClient();
 
@@ -40,7 +40,10 @@ function App() {
                       <Route path="new" element={<NewProduction />} />
                       <Route path="edit/:id" element={<NewProduction />} />
                     </Route>
-                    <Route path="usuarios">
+                    <Route
+                      path="usuarios"
+                      element={<ProtectedRoute adminOnly redirect="/" />}
+                    >
                       <Route index element={<Users />} />
                       <Route path="new" element={<NewUser />} />
                       <Route path="edit/:id" element={<NewUser />} />

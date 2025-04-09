@@ -1,10 +1,10 @@
 import { useAppSelector } from "../store";
 
 export function useAuth() {
-  const token = useAppSelector((state) => state.user.token);
+  const user = useAppSelector((state) => state.user);
 
   return {
-    token,
-    isAuthenticated: !!token,
+    ...user,
+    isAuthenticated: !!user.token,
   };
 }

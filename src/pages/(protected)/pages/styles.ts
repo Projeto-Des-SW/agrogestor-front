@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import styled from "styled-components";
 
 export const Container = styled.div`
@@ -48,7 +48,7 @@ export const Filters = styled.div`
   flex-wrap: wrap;
   align-items: center;
 
-  @media (max-width: 768px) {
+  @media (width <= 768px) {
     flex-direction: column;
   }
 `;
