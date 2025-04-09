@@ -79,7 +79,7 @@ export default function Members() {
           <S.Title>Clientes Cadastrados</S.Title>
           <S.Filters>
             <Autocomplete
-              sx={{ width: 300 }}
+              sx={{ width: 250 }}
               size="small"
               onChange={(_, value) => setMemberFilter(value?.id)}
               getOptionLabel={(option) => option.name}
@@ -95,7 +95,7 @@ export default function Members() {
               )}
             />
             <Autocomplete
-              sx={{ width: 300 }}
+              sx={{ width: 250 }}
               size="small"
               onChange={(_, value) => setGroupFilter(value?.id)}
               getOptionLabel={(option) => option.name}

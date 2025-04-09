@@ -80,7 +80,7 @@ export default function Sales() {
           <S.Title>Vendas</S.Title>
           <S.Filters>
             <Autocomplete
-              sx={{ width: 300 }}
+              sx={{ width: 200 }}
               size="small"
               onChange={(_, value) => setMemberFilter(value?.id)}
               getOptionLabel={(option) => option.name}
@@ -96,7 +96,7 @@ export default function Sales() {
               )}
             />
             <Autocomplete
-              sx={{ width: 300 }}
+              sx={{ width: 200 }}
               size="small"
               onChange={(_, value) => setGroupFilter(value?.id)}
               getOptionLabel={(option) => option.name}
@@ -112,11 +112,13 @@ export default function Sales() {
               )}
             />
             <DatePicker
+              sx={{ width: 200 }}
               label="Início"
               slotProps={{ textField: { size: "small" } }}
               onChange={(date) => setStartDateFilter(date?.toDate())}
             />
             <DatePicker
+              sx={{ width: 200 }}
               label="Fim"
               slotProps={{ textField: { size: "small" } }}
               onChange={(date) => setEndDateFilter(date?.toDate())}

@@ -34,6 +34,7 @@ export const CardHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
+  gap: 8px;
 `;
 
 export const Title = styled.h2`

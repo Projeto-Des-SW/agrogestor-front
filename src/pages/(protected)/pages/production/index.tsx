@@ -86,7 +86,7 @@ export default function Production() {
           <S.Title>Registros de Produção</S.Title>
           <S.Filters>
             <Autocomplete
-              sx={{ width: 300 }}
+              sx={{ width: 200 }}
               size="small"
               onChange={(_, value) => setMemberFilter(value?.id)}
               getOptionLabel={(option) => option.name}
@@ -102,7 +102,7 @@ export default function Production() {
               )}
             />
             <Autocomplete
-              sx={{ width: 300 }}
+              sx={{ width: 200 }}
               size="small"
               onChange={(_, value) => setGroupFilter(value?.id)}
               getOptionLabel={(option) => option.name}
@@ -118,11 +118,13 @@ export default function Production() {
               )}
             />
             <DatePicker
+              sx={{ width: 200 }}
               label="Início"
               slotProps={{ textField: { size: "small" } }}
               onChange={(date) => setStartDateFilter(date?.toDate())}
             />
             <DatePicker
+              sx={{ width: 200 }}
               label="Fim"
               slotProps={{ textField: { size: "small" } }}
               onChange={(date) => setEndDateFilter(date?.toDate())}
