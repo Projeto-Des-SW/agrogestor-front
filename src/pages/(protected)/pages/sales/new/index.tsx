@@ -124,7 +124,7 @@ export default function NewSale() {
   return (
     <S.Container>
       <S.Header>
-        <h1>Nova Venda</h1>
+        <h1>{id ? "Editar Venda" : "Nova Venda"}</h1>
         <Button as={Link} to="/vendas" variant="dark">
           Voltar
         </Button>
@@ -137,7 +137,7 @@ export default function NewSale() {
           flexDirection: "column",
         }}
       >
-        <S.Title>Nova Venda</S.Title>
+        <S.Title>{id ? "Editar Venda" : "Nova Venda"}</S.Title>
         <S.MemberAndDate>
           <Autocomplete
             sx={{ width: "100%" }}
@@ -155,7 +155,7 @@ export default function NewSale() {
               const { inputValue } = params;
 
               const isExisting = options.some(
-                (option) => inputValue === option,
+                (option) => inputValue === option
               );
               if (inputValue !== "" && !isExisting) {
                 filtered.push(inputValue);
@@ -183,10 +183,10 @@ export default function NewSale() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Data</TableCell>
-              <TableCell>Produto</TableCell>
-              <TableCell>Quantidade</TableCell>
-              <TableCell>Preço Unit.</TableCell>
+              <TableCell sx={{ width: "20%" }}>Data</TableCell>
+              <TableCell sx={{ width: "60%" }}>Produto</TableCell>
+              <TableCell sx={{ width: "10%" }}>Quantidade</TableCell>
+              <TableCell sx={{ width: "10%" }}>Preço Unit.</TableCell>
               <TableCell>Total</TableCell>
               <TableCell />
             </TableRow>
@@ -194,7 +194,7 @@ export default function NewSale() {
           <TableBody>
             {sale.items.map((item, index) => (
               <TableRow key={index}>
-                <TableCell sx={{ width: "20%" }}>
+                <TableCell>
                   <DatePicker
                     label="Data"
                     sx={{ width: "100%" }}
@@ -208,7 +208,7 @@ export default function NewSale() {
                     defaultValue={dayjs(sale.items[index].date)}
                   />
                 </TableCell>
-                <TableCell sx={{ width: "60%" }}>
+                <TableCell>
                   <Autocomplete
                     size="small"
                     onChange={(_, value) =>
@@ -225,7 +225,7 @@ export default function NewSale() {
                       const { inputValue } = params;
 
                       const isExisting = options.some(
-                        (option) => inputValue === option,
+                        (option) => inputValue === option
                       );
                       if (inputValue !== "" && !isExisting) {
                         filtered.push(inputValue);
@@ -244,7 +244,7 @@ export default function NewSale() {
                     value={item.productName || ""}
                   />
                 </TableCell>
-                <TableCell sx={{ width: "10%" }}>
+                <TableCell>
                   <TextField
                     type="number"
                     size="small"
@@ -254,7 +254,7 @@ export default function NewSale() {
                       setSale((draft) => {
                         draft.items[index].quantity = Math.max(
                           0,
-                          Number(event.target.value),
+                          Number(event.target.value)
                         );
                       });
                     }}
@@ -264,7 +264,7 @@ export default function NewSale() {
                     error={!item.quantity}
                   />
                 </TableCell>
-                <TableCell sx={{ width: "10%" }}>
+                <TableCell>
                   <TextField
                     type="number"
                     size="small"
@@ -278,7 +278,7 @@ export default function NewSale() {
                       setSale((draft) => {
                         draft.items[index].price = Math.max(
                           0,
-                          Number(event.target.value),
+                          Number(event.target.value)
                         );
                         draft.items[index].hasUserChangedPrice = true;
                       });
@@ -292,7 +292,7 @@ export default function NewSale() {
                   {formatCurrency(
                     (item.hasUserChangedPrice
                       ? item.price
-                      : (productPrices[index]?.price ?? 0)) * item.quantity,
+                      : (productPrices[index]?.price ?? 0)) * item.quantity
                   )}
                 </TableCell>
                 <TableCell>

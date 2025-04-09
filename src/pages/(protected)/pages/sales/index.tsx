@@ -126,29 +126,27 @@ export default function Sales() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Data</TableCell>
-              <TableCell>Cliente</TableCell>
-              <TableCell>Total</TableCell>
-              <TableCell>Ações</TableCell>
+              <TableCell sx={{ width: "30%" }}>Data</TableCell>
+              <TableCell sx={{ width: "30%" }}>Cliente</TableCell>
+              <TableCell sx={{ width: "30%" }}>Total</TableCell>
+              <TableCell sx={{ width: "10%" }}>Ações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {sales?.map((sale) => (
               <TableRow key={sale.id}>
-                <TableCell sx={{ width: "30%" }}>
-                  {sale.date.toLocaleDateString()}
-                </TableCell>
-                <TableCell sx={{ width: "30%" }}>{sale.member.name}</TableCell>
-                <TableCell sx={{ width: "30%" }}>
+                <TableCell>{sale.date.toLocaleDateString()}</TableCell>
+                <TableCell>{sale.member.name}</TableCell>
+                <TableCell>
                   {formatCurrency(
                     sum(
                       sale.saleItems.map(
-                        (item) => item.quantity * item.productPrice.price,
-                      ),
-                    ),
+                        (item) => item.quantity * item.productPrice.price
+                      )
+                    )
                   )}
                 </TableCell>
-                <TableCell sx={{ width: "10%" }}>
+                <TableCell>
                   <IconButton
                     onClick={() => navigate(`/vendas/edit/${sale.id}`)}
                   >

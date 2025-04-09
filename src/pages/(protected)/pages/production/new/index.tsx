@@ -102,7 +102,9 @@ export default function NewProduction() {
           flexDirection: "column",
         }}
       >
-        <S.Title>Novo Registro de Produção</S.Title>
+        <S.Title>
+          {id ? "Editar Registro de Produção" : "Novo Registro de Produção"}
+        </S.Title>
         <S.MemberAndDate>
           <Autocomplete
             sx={{ width: "100%" }}
@@ -120,7 +122,7 @@ export default function NewProduction() {
               const { inputValue } = params;
 
               const isExisting = options.some(
-                (option) => inputValue === option,
+                (option) => inputValue === option
               );
               if (inputValue !== "" && !isExisting) {
                 filtered.push(inputValue);
@@ -152,10 +154,10 @@ export default function NewProduction() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Data</TableCell>
-              <TableCell>Turno</TableCell>
-              <TableCell>Litros</TableCell>
-              <TableCell>Preço</TableCell>
+              <TableCell sx={{ width: "20%" }}>Data</TableCell>
+              <TableCell sx={{ width: "10%" }}>Turno</TableCell>
+              <TableCell sx={{ width: "30%" }}>Litros</TableCell>
+              <TableCell sx={{ width: "30%" }}>Preço</TableCell>
               <TableCell>Total</TableCell>
               <TableCell />
             </TableRow>
@@ -163,7 +165,7 @@ export default function NewProduction() {
           <TableBody>
             {production.entries.map((entry, index) => (
               <TableRow key={index}>
-                <TableCell sx={{ width: "20%" }}>
+                <TableCell>
                   <DatePicker
                     label="Data"
                     sx={{ width: "100%" }}
@@ -176,7 +178,7 @@ export default function NewProduction() {
                     defaultValue={dayjs(production.entries[index].date)}
                   />
                 </TableCell>
-                <TableCell sx={{ width: "10%" }}>
+                <TableCell>
                   <ToggleButtonGroup
                     onChange={(_, value) =>
                       setProduction((draft) => {
@@ -195,7 +197,7 @@ export default function NewProduction() {
                     </ToggleButton>
                   </ToggleButtonGroup>
                 </TableCell>
-                <TableCell sx={{ width: "30%" }}>
+                <TableCell>
                   <TextField
                     sx={{ width: "100%" }}
                     type="number"
@@ -206,7 +208,7 @@ export default function NewProduction() {
                       setProduction((draft) => {
                         draft.entries[index].quantity = Math.max(
                           0,
-                          Number(event.target.value),
+                          Number(event.target.value)
                         );
                       });
                     }}
@@ -216,7 +218,7 @@ export default function NewProduction() {
                     error={!entry.quantity}
                   />
                 </TableCell>
-                <TableCell sx={{ width: "30%" }}>
+                <TableCell>
                   <TextField
                     type="number"
                     size="small"
@@ -226,7 +228,7 @@ export default function NewProduction() {
                       setProduction((draft) => {
                         draft.entries[index].price = Math.max(
                           0,
-                          Number(event.target.value),
+                          Number(event.target.value)
                         );
                       });
                     }}
@@ -244,7 +246,7 @@ export default function NewProduction() {
                     onClick={() =>
                       setProduction((draft) => {
                         draft.entries = draft.entries.filter(
-                          (_, i) => i !== index,
+                          (_, i) => i !== index
                         );
                       })
                     }
@@ -276,7 +278,7 @@ export default function NewProduction() {
           <h2>
             Total:{" "}
             {formatCurrency(
-              sum(production.entries.map((e) => e.price * e.quantity)),
+              sum(production.entries.map((e) => e.price * e.quantity))
             )}
           </h2>
           <Box sx={{ display: "flex", gap: "10px" }}>

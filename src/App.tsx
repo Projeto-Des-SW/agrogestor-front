@@ -50,7 +50,7 @@ function App() {
                       <Route path="new" element={<NewUser />} />
                       <Route path="edit/:id" element={<NewUser />} />
                     </Route>
-                    <Route path="membros">
+                    <Route path="clientes">
                       <Route index element={<Members />} />
                       <Route path="new" element={<NewMember />} />
                       <Route path="edit/:id" element={<NewMember />} />

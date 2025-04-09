@@ -54,16 +54,16 @@ export default function SideMenu() {
             <LuMilk color="#1E293B" />
             Produção
           </S.MenuItem>
+          <S.MenuItem to="/clientes">
+            <RiGroupLine color="#1E293B" />
+            Clientes
+          </S.MenuItem>
           {role === "ADMIN" && (
             <S.MenuItem to="/usuarios">
               <LuUser color="#1E293B" />
               Usuários
             </S.MenuItem>
           )}
-          <S.MenuItem to="/membros">
-            <RiGroupLine color="#1E293B" />
-            Membros
-          </S.MenuItem>
         </S.ItensContainer>
       </S.ContentContainer>
       <S.LogoutButton

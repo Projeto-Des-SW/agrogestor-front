@@ -46,7 +46,7 @@ export default function Production() {
     queryFn: () => getMembers(token!),
   });
   const groups = Array.from(
-    new Map(members?.map((member) => [member.group.id, member.group])).values(),
+    new Map(members?.map((member) => [member.group.id, member.group])).values()
   );
   const { data: productionLogs } = useQuery<ProductionLog[]>({
     queryKey: ["productionLog", filters],
@@ -134,29 +134,27 @@ export default function Production() {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Data</TableCell>
-                <TableCell>Cliente</TableCell>
-                <TableCell>Total</TableCell>
-                <TableCell>Ações</TableCell>
+                <TableCell sx={{ width: "30%" }}>Data</TableCell>
+                <TableCell sx={{ width: "30%" }}>Cliente</TableCell>
+                <TableCell sx={{ width: "30%" }}>Total</TableCell>
+                <TableCell sx={{ width: "10%" }}>Ações</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {productionLogs?.map((log) => (
                 <TableRow key={log.id}>
-                  <TableCell sx={{ width: "30%" }}>
-                    {log.date.toLocaleDateString()}
-                  </TableCell>
-                  <TableCell sx={{ width: "30%" }}>{log.member.name}</TableCell>
-                  <TableCell sx={{ width: "30%" }}>
+                  <TableCell>{log.date.toLocaleDateString()}</TableCell>
+                  <TableCell>{log.member.name}</TableCell>
+                  <TableCell>
                     {formatCurrency(
                       sum(
                         log.productionEntries.map(
-                          (entry) => entry.quantity * entry.price,
-                        ),
-                      ),
+                          (entry) => entry.quantity * entry.price
+                        )
+                      )
                     )}
                   </TableCell>
-                  <TableCell sx={{ width: "10%" }}>
+                  <TableCell>
                     <IconButton
                       onClick={() => navigate(`/producao/edit/${log.id}`)}
                     >

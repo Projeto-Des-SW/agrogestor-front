@@ -1,9 +1,3 @@
-import { Link, useNavigate } from "react-router";
-import { useAuth } from "../../../../hooks/useAuth";
-import * as S from "../styles";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { deleteMember, getGroups, getMembers } from "../../../../services/api";
-import Button from "../../../../components/Button";
 import {
   Autocomplete,
   Card,
@@ -15,9 +9,14 @@ import {
   TableRow,
   TextField,
 } from "@mui/material";
-import { Trash2 } from "lucide-react";
-import { FiEdit } from "react-icons/fi";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Pencil, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router";
+import Button from "../../../../components/Button";
+import { useAuth } from "../../../../hooks/useAuth";
+import { deleteMember, getGroups, getMembers } from "../../../../services/api";
+import * as S from "../styles";
 
 export default function Members() {
   const { token } = useAuth();
@@ -48,19 +47,13 @@ export default function Members() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteMember(token!, id),
-    onSuccess: () => {
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["members"] });
-    },
-    onError: (error: any) => {
-      alert("Erro ao excluir membro: " + error?.response?.data?.message || error.message);
     },
   });
 
   const handleDelete = (id: number) => {
-    const confirmed = window.confirm(
-      "Tem certeza que deseja excluir este membro?"
-    );
-    if (confirmed) {
+    if (confirm("Tem certeza que deseja excluir este cliente?")) {
       deleteMutation.mutate(id);
     }
   };
@@ -68,9 +61,9 @@ export default function Members() {
   return (
     <S.Container>
       <S.Header>
-        <h1>Gerenciar Membros</h1>
+        <h1>Gerenciar Clientes</h1>
         <Button as={Link} to="new" variant="dark">
-          Novo Membro
+          Novo Cliente
         </Button>
       </S.Header>
 
@@ -83,7 +76,7 @@ export default function Members() {
         }}
       >
         <S.CardHeader>
-          <S.Title>Membros Cadastrados</S.Title>
+          <S.Title>Clientes Cadastrados</S.Title>
           <S.Filters>
             <Autocomplete
               sx={{ width: 300 }}
@@ -91,14 +84,14 @@ export default function Members() {
               onChange={(_, value) => setMemberFilter(value?.id)}
               getOptionLabel={(option) => option.name}
               options={[
-                { name: "Todos os membros", id: undefined },
+                { name: "Todos os clientes", id: undefined },
                 ...(members ?? []),
               ]}
               autoSelect
               disableClearable
-              defaultValue={{ name: "Todos os membros", id: undefined }}
+              defaultValue={{ name: "Todos os clientes", id: undefined }}
               renderInput={(params) => (
-                <TextField {...params} label="Filtrar membros" />
+                <TextField {...params} label="Filtrar clientes" />
               )}
             />
             <Autocomplete
@@ -122,49 +115,25 @@ export default function Members() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Nome</TableCell>
-              <TableCell>Grupo</TableCell>
-              <TableCell align="center">Ações</TableCell>
+              <TableCell sx={{ width: "45%" }}>Nome</TableCell>
+              <TableCell sx={{ width: "45%" }}>Grupo</TableCell>
+              <TableCell sx={{ width: "10%" }}>Ações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredMembers?.map((member) => (
-              <TableRow
-                key={member.id}
-                sx={{
-                  cursor: "pointer",
-                  ":hover": { backgroundColor: "#f8f8f8" },
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`edit/${member.id}`, { state: { member } });
-                }}
-              >
-                <TableCell sx={{ width: "50%" }}>{member.name}</TableCell>
-                <TableCell sx={{ width: "50%" }}>{member.group.name}</TableCell>
-                <TableCell
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    gap: 1,
-                  }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <IconButton
-                    sx={{ color: "dodgerblue" }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`edit/${member.id}`, { state: { member } });
-                    }}
-                  >
-                    <FiEdit />
+              <TableRow key={member.id}>
+                <TableCell>{member.name}</TableCell>
+                <TableCell>{member.group.name}</TableCell>
+                <TableCell>
+                  <IconButton onClick={() => navigate(`edit/${member.id}`)}>
+                    <Pencil size={16} />
                   </IconButton>
                   <IconButton
                     sx={{ color: "red" }}
                     onClick={() => handleDelete(member.id)}
                   >
-                    <Trash2 />
+                    <Trash2 size={16} />
                   </IconButton>
                 </TableCell>
               </TableRow>
