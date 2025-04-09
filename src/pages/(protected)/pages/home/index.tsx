@@ -110,10 +110,10 @@ export default function Home() {
     },
     {
       title: "Clientes",
-      description: "Membros ativos da plataforma",
-      buttonLabel: "Gerenciar Membros",
+      description: "Clientes cadastrados na plataforma",
+      buttonLabel: "Gerenciar clientes",
       color: "info",
-      redirectTo: "/membros",
+      redirectTo: "/clientes",
     },
   ] as const;
 
@@ -156,7 +156,7 @@ export default function Home() {
         />
         <SummaryCard
           title="Clientes"
-          subtitle="Membros ativos"
+          subtitle="Clientes cadastrados"
           value={members.length.toString()}
           footer={`Em ${groups.length} grupos`}
           icon={<PeopleIcon color="action" />}
@@ -206,7 +206,7 @@ export default function Home() {
             <TableHead>
               <TableRow>
                 <TableCell>Data</TableCell>
-                <TableCell>Membro</TableCell>
+                <TableCell>Cliente</TableCell>
                 <TableCell>Total</TableCell>
                 <TableCell align="right"></TableCell>
               </TableRow>
@@ -248,7 +248,7 @@ export default function Home() {
             <TableHead>
               <TableRow>
                 <TableCell>Data</TableCell>
-                <TableCell>Membro</TableCell>
+                <TableCell>Cliente</TableCell>
                 <TableCell>Total</TableCell>
                 <TableCell align="right"></TableCell>
               </TableRow>
