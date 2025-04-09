@@ -3,4 +3,5 @@ export interface Member {
   name: string;
   disabled: boolean;
   groupId: number;
+  groupName?: string;
 }

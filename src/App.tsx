@@ -9,6 +9,8 @@ import Users from "./pages/(protected)/(admin)/users";
 import NewUser from "./pages/(protected)/(admin)/users/new";
 import MainLayout from "./pages/(protected)/layout";
 import Home from "./pages/(protected)/pages/home";
+import Members from "./pages/(protected)/pages/members";
+import NewMember from "./pages/(protected)/pages/members/new";
 import Production from "./pages/(protected)/pages/production";
 import NewProduction from "./pages/(protected)/pages/production/new";
 import Sales from "./pages/(protected)/pages/sales";
@@ -47,6 +49,11 @@ function App() {
                       <Route index element={<Users />} />
                       <Route path="new" element={<NewUser />} />
                       <Route path="edit/:id" element={<NewUser />} />
+                    </Route>
+                    <Route path="membros">
+                      <Route index element={<Members />} />
+                      <Route path="new" element={<NewMember />} />
+                      <Route path="edit/:id" element={<NewMember />} />
                     </Route>
                   </Route>
                 </Route>

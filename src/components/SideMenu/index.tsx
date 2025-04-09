@@ -6,6 +6,7 @@ import {
   LuMilk,
   LuUser,
 } from "react-icons/lu";
+import { RiGroupLine } from "react-icons/ri";
 import { Link } from "react-router";
 import { useAuth } from "../../hooks/useAuth";
 import { useAppDispatch, userActions } from "../../store";
@@ -59,6 +60,10 @@ export default function SideMenu() {
               Usuários
             </S.MenuItem>
           )}
+          <S.MenuItem to="/membros">
+            <RiGroupLine color="#1E293B" />
+            Membros
+          </S.MenuItem>
         </S.ItensContainer>
       </S.ContentContainer>
       <S.LogoutButton
