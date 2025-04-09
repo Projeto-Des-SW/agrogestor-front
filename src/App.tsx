@@ -15,6 +15,8 @@ import { persistor, store } from "./store";
 import Users from "./pages/(protected)/pages/users";
 import NewUser from "./pages/(protected)/pages/users/new";
 import Home from "./pages/(protected)/pages/home";
+import Members from "./pages/(protected)/pages/members";
+import NewMember from "./pages/(protected)/pages/members/new";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +46,11 @@ function App() {
                       <Route index element={<Users />} />
                       <Route path="new" element={<NewUser />} />
                       <Route path="edit/:id" element={<NewUser />} />
+                    </Route>
+                    <Route path="membros">
+                      <Route index element={<Members />} />
+                      <Route path="new" element={<NewMember />} />
+                      <Route path="edit/:id" element={<NewMember />} />
                     </Route>
                   </Route>
                 </Route>

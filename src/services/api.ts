@@ -21,6 +21,39 @@ export async function getMembers(token: string) {
   ).data as (Member & { group: Group })[];
 }
 
+export async function getMember(token: string, id: number | string) {
+  return (
+    await api.get(`members/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+  ).data as Member & { group: Group };
+}
+
+export async function postMember(
+  token: string,
+  member: { name: string; groupName: string }
+) {
+  return api.post("members", member, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function patchMember(
+  token: string,
+  id: number | string,
+  member: { name: string; groupName: string }
+) {
+  return api.patch(`members/${id}`, member, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function deleteMember(token: string, id: number | string) {
+  return api.delete(`members/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
 export async function getGroups(token: string) {
   return (
     await api.get("groups", {
