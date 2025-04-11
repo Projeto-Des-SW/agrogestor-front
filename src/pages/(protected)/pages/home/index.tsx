@@ -30,6 +30,7 @@ import { SummaryCard } from "../../../../components/SummaryCard";
 import AgricultureIcon from "@mui/icons-material/Agriculture";
 import PeopleIcon from "@mui/icons-material/People";
 import { useNavigate } from "react-router";
+import { Loading } from "../../../../components/Loading";
 
 export default function Home() {
   const { token } = useAuth();
@@ -39,25 +40,26 @@ export default function Home() {
   const currentYear = now.getFullYear();
   const navigate = useNavigate();
 
-  const { data: members = [] } = useQuery<Member[]>({
+  const { data: members = [], isLoading: membersLoading } = useQuery<Member[]>({
     queryKey: ["members"],
     queryFn: () => getMembers(token!),
   });
 
-  const { data: groups = [] } = useQuery<Group[]>({
+  const { data: groups = [], isLoading: groupsLoading } = useQuery<Group[]>({
     queryKey: ["groups"],
     queryFn: () => getGroups(token!),
   });
 
-  const { data: sales = [] } = useQuery<Sale[]>({
+  const { data: sales = [], isLoading: salesLoading } = useQuery<Sale[]>({
     queryKey: ["sales"],
     queryFn: () => getSales(token!, {}),
   });
 
-  const { data: productionLogs = [] } = useQuery<ProductionLog[]>({
-    queryKey: ["productionLogs"],
-    queryFn: () => getProductionLogs(token!, {}),
-  });
+  const { data: productionLogs = [], isLoading: productionLogsLoading } =
+    useQuery<ProductionLog[]>({
+      queryKey: ["productionLogs"],
+      queryFn: () => getProductionLogs(token!, {}),
+    });
 
   const totalSales = sales
     .filter((sale) => {
@@ -116,6 +118,13 @@ export default function Home() {
       redirectTo: "/clientes",
     },
   ] as const;
+
+  const loading =
+    membersLoading || groupsLoading || salesLoading || productionLogsLoading;
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <Box sx={{ px: 10, mt: 5, width: "100%" }}>
@@ -220,7 +229,7 @@ export default function Home() {
                     cursor: "pointer",
                     ":hover": { backgroundColor: "#f8f8f8" },
                   }}
-                > 
+                >
                   <TableCell>{sale.member.name}</TableCell>
                   <TableCell>
                     {new Date(sale.date).toLocaleDateString()}

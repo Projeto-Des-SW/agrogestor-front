@@ -26,6 +26,7 @@ import {
 } from "../../../../services/api";
 import { formatCurrency } from "../../../../util/formatCurrency";
 import * as S from "../styles";
+import { Loading } from "../../../../components/Loading";
 
 export default function Production() {
   const { token } = useAuth();
@@ -41,17 +42,19 @@ export default function Production() {
     startDate: startDateFilter,
     endDate: endDateFilter,
   };
-  const { data: members } = useQuery({
+
+  const { data: members, isLoading: membersLoading } = useQuery({
     queryKey: ["members"],
     queryFn: () => getMembers(token!),
   });
-  const groups = Array.from(
-    new Map(members?.map((member) => [member.group.id, member.group])).values()
-  );
-  const { data: productionLogs } = useQuery<ProductionLog[]>({
+
+  const { data: productionLogs, isLoading: productionLogsLoading } = useQuery<
+    ProductionLog[]
+  >({
     queryKey: ["productionLog", filters],
     queryFn: () => getProductionLogs(token!, filters),
   });
+
   const deleteLogMutation = useMutation({
     mutationFn: (id: number) => deleteProductionLog(token!, id),
     onSuccess: () => {
@@ -59,10 +62,17 @@ export default function Production() {
     },
   });
 
+  const groups = Array.from(
+    new Map(members?.map((member) => [member.group.id, member.group])).values(),
+  );
+
   function handleDelete(id: number) {
     if (confirm("Tem certeza que deseja excluir este registro de produção?")) {
       deleteLogMutation.mutate(id);
     }
+  }
+  if (membersLoading || productionLogsLoading) {
+    return <Loading />;
   }
 
   return (
@@ -151,9 +161,9 @@ export default function Production() {
                     {formatCurrency(
                       sum(
                         log.productionEntries.map(
-                          (entry) => entry.quantity * entry.price
-                        )
-                      )
+                          (entry) => entry.quantity * entry.price,
+                        ),
+                      ),
                     )}
                   </TableCell>
                   <TableCell>

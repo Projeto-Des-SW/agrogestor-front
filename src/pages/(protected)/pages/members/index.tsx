@@ -17,6 +17,7 @@ import Button from "../../../../components/Button";
 import { useAuth } from "../../../../hooks/useAuth";
 import { deleteMember, getGroups, getMembers } from "../../../../services/api";
 import * as S from "../styles";
+import { Loading } from "../../../../components/Loading";
 
 export default function Members() {
   const { token } = useAuth();
@@ -25,12 +26,12 @@ export default function Members() {
   const [groupFilter, setGroupFilter] = useState<number>();
   const queryClient = useQueryClient();
 
-  const { data: members } = useQuery({
+  const { data: members, isLoading: membersLoading } = useQuery({
     queryKey: ["members"],
     queryFn: () => getMembers(token!),
   });
 
-  const { data: groups } = useQuery({
+  const { data: groups, isLoading: groupsLoading } = useQuery({
     queryKey: ["groups"],
     queryFn: () => getGroups(token!),
   });
@@ -57,6 +58,10 @@ export default function Members() {
       deleteMutation.mutate(id);
     }
   };
+
+  if (membersLoading || groupsLoading) {
+    return <Loading />;
+  }
 
   return (
     <S.Container>

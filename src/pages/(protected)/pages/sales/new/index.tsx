@@ -31,6 +31,7 @@ import {
 } from "../../../../../services/api";
 import { formatCurrency } from "../../../../../util/formatCurrency";
 import * as S from "../../styles";
+import { Loading } from "../../../../../components/Loading";
 
 export type NewSale = {
   memberName: string | null;
@@ -48,19 +49,23 @@ export default function NewSale() {
   const { token } = useAuth();
   const navigate = useNavigate();
   const { id } = useParams();
-  const { data: members } = useQuery({
+
+  const { data: members, isLoading: membersLoading } = useQuery({
     queryKey: ["members"],
     queryFn: () => getMembers(token!),
   });
-  const { data: products } = useQuery({
+
+  const { data: products, isLoading: productsLoading } = useQuery({
     queryKey: ["products"],
     queryFn: () => getProducts(token!),
   });
-  const { data: fetchedSale } = useQuery({
+
+  const { data: fetchedSale, isLoading: saleLoading } = useQuery({
     queryKey: ["sales", id],
     queryFn: () => getSale(token!, id!),
     enabled: !!id,
   });
+
   const [sale, setSale] = useImmer<NewSale>({
     memberName: null,
     date: new Date(),
@@ -84,7 +89,7 @@ export default function NewSale() {
         }),
     })),
   }).map((e) => e.data);
-  const { mutate: submit } = useMutation({
+  const { mutate: submit, isPending: isSubmitting } = useMutation({
     mutationFn: (sale: NewSale) =>
       id ? patchSale(token!, id, sale) : postSale(token!, sale),
     onSettled: () => {
@@ -121,6 +126,10 @@ export default function NewSale() {
     !sale.items.length ||
     sale.items.some((e) => !e.productName || !e.quantity);
 
+  if (membersLoading || productsLoading || (id && saleLoading)) {
+    return <Loading />;
+  }
+
   return (
     <S.Container>
       <S.Header>
@@ -155,7 +164,7 @@ export default function NewSale() {
               const { inputValue } = params;
 
               const isExisting = options.some(
-                (option) => inputValue === option
+                (option) => inputValue === option,
               );
               if (inputValue !== "" && !isExisting) {
                 filtered.push(inputValue);
@@ -225,7 +234,7 @@ export default function NewSale() {
                       const { inputValue } = params;
 
                       const isExisting = options.some(
-                        (option) => inputValue === option
+                        (option) => inputValue === option,
                       );
                       if (inputValue !== "" && !isExisting) {
                         filtered.push(inputValue);
@@ -254,7 +263,7 @@ export default function NewSale() {
                       setSale((draft) => {
                         draft.items[index].quantity = Math.max(
                           0,
-                          Number(event.target.value)
+                          Number(event.target.value),
                         );
                       });
                     }}
@@ -278,7 +287,7 @@ export default function NewSale() {
                       setSale((draft) => {
                         draft.items[index].price = Math.max(
                           0,
-                          Number(event.target.value)
+                          Number(event.target.value),
                         );
                         draft.items[index].hasUserChangedPrice = true;
                       });
@@ -292,7 +301,7 @@ export default function NewSale() {
                   {formatCurrency(
                     (item.hasUserChangedPrice
                       ? item.price
-                      : (productPrices[index]?.price ?? 0)) * item.quantity
+                      : (productPrices[index]?.price ?? 0)) * item.quantity,
                   )}
                 </TableCell>
                 <TableCell>
@@ -342,7 +351,7 @@ export default function NewSale() {
               onClick={() => submit(sale)}
               variant={saveDisabled ? "gray" : undefined}
             >
-              Salvar
+              {isSubmitting ? "Salvando..." : "Salvar"}
             </Button>
           </Box>
         </Box>

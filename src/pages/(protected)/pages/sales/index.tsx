@@ -20,6 +20,7 @@ import { useAuth } from "../../../../hooks/useAuth";
 import { deleteSale, getMembers, getSales } from "../../../../services/api";
 import { formatCurrency } from "../../../../util/formatCurrency";
 import * as S from "../styles";
+import { Loading } from "../../../../components/Loading";
 
 export default function Sales() {
   const { token } = useAuth();
@@ -35,17 +36,21 @@ export default function Sales() {
     startDate: startDateFilter,
     endDate: endDateFilter,
   };
-  const { data: members } = useQuery({
+
+  const { data: members, isLoading: membersLoading } = useQuery({
     queryKey: ["members"],
     queryFn: () => getMembers(token!),
   });
-  const groups = Array.from(
-    new Map(members?.map((member) => [member.group.id, member.group])).values(),
-  );
-  const { data: sales } = useQuery({
+
+  const { data: sales, isLoading: salesLoading } = useQuery({
     queryKey: ["sales", filters],
     queryFn: () => getSales(token!, filters),
   });
+
+  const groups = Array.from(
+    new Map(members?.map((member) => [member.group.id, member.group])).values(),
+  );
+
   const deleteSaleMutation = useMutation({
     mutationFn: (id: number) => deleteSale(token!, id),
     onSettled: () => {
@@ -59,6 +64,9 @@ export default function Sales() {
     }
   }
 
+  if (membersLoading || salesLoading) {
+    return <Loading />;
+  }
   return (
     <S.Container>
       <S.Header>
@@ -143,9 +151,9 @@ export default function Sales() {
                   {formatCurrency(
                     sum(
                       sale.saleItems.map(
-                        (item) => item.quantity * item.productPrice.price
-                      )
-                    )
+                        (item) => item.quantity * item.productPrice.price,
+                      ),
+                    ),
                   )}
                 </TableCell>
                 <TableCell>

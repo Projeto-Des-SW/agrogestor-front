@@ -39,7 +39,7 @@ export async function postMember(token: string, member: NewMember) {
 export async function patchMember(
   token: string,
   id: number | string,
-  member: NewMember
+  member: NewMember,
 ) {
   return api.patch(`members/${id}`, member, {
     headers: { Authorization: `Bearer ${token}` },
@@ -66,7 +66,7 @@ export async function getSale(token: string, id: number | string) {
       await api.get(`sales/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-    ).data
+    ).data,
   );
 }
 
@@ -77,7 +77,7 @@ export async function getSales(
     groupId?: number;
     startDate?: Date;
     endDate?: Date;
-  }
+  },
 ) {
   return (
     await api.get("sales", {
@@ -95,7 +95,7 @@ export async function getProducts(token: string) {
 
 export async function getProductPrice(
   token: string,
-  params: { product: string; date: Date; memberName: string }
+  params: { product: string; date: Date; memberName: string },
 ) {
   return (
     await api.get("prices", {
@@ -114,7 +114,7 @@ export async function postSale(token: string, sale: NewSale) {
 export async function patchSale(
   token: string,
   id: number | string,
-  sale: NewSale
+  sale: NewSale,
 ) {
   return api.patch(`sales/${id}`, sale, {
     headers: { Authorization: `Bearer ${token}` },
@@ -123,14 +123,14 @@ export async function patchSale(
 
 export async function getProductionLog(
   token: string,
-  id: number | string
+  id: number | string,
 ): Promise<ProductionLog> {
   return mapToProductionLog(
     (
       await api.get(`productionLog/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-    ).data
+    ).data,
   );
 }
 
@@ -140,7 +140,7 @@ export async function getProductionLogs(
     memberId?: number;
     startDate?: Date;
     endDate?: Date;
-  }
+  },
 ): Promise<ProductionLog[]> {
   return (
     await api.get("productionLog", {
@@ -159,7 +159,7 @@ export async function postProductionLog(token: string, log: NewProduction) {
 export async function patchProductionLog(
   token: string,
   id: number | string,
-  log: NewProduction
+  log: NewProduction,
 ) {
   return api.patch(`productionLog/${id}`, log, {
     headers: { Authorization: `Bearer ${token}` },

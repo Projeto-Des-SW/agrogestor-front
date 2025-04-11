@@ -19,6 +19,7 @@ import {
   postMember,
 } from "../../../../../services/api";
 import * as S from "../../styles";
+import { Loading } from "../../../../../components/Loading";
 
 export interface NewMember {
   name: string;
@@ -37,13 +38,13 @@ export default function NewMember() {
     groupName: null,
   });
 
-  const { data: fetchedMember } = useQuery({
+  const { data: fetchedMember, isLoading: memberLoading } = useQuery({
     queryKey: ["members", id],
     queryFn: () => getMember(token!, id!),
     enabled: isEdit,
   });
 
-  const { data: groups } = useQuery<Group[]>({
+  const { data: groups, isLoading: groupsLoading } = useQuery<Group[]>({
     queryKey: ["groups"],
     queryFn: () => getGroups(token!),
   });
@@ -67,6 +68,10 @@ export default function NewMember() {
   });
 
   const saveDisabled = !member.name || !member.groupName;
+
+  if ((isEdit && memberLoading) || groupsLoading) {
+    return <Loading />;
+  }
 
   return (
     <S.Container>
@@ -114,7 +119,7 @@ export default function NewMember() {
               const { inputValue } = params;
 
               const isExisting = options.some(
-                (option) => inputValue === option
+                (option) => inputValue === option,
               );
               if (inputValue !== "" && !isExisting) {
                 filtered.push(inputValue);

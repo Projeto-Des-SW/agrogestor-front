@@ -32,6 +32,7 @@ import {
 } from "../../../../../services/api";
 import { formatCurrency } from "../../../../../util/formatCurrency";
 import * as S from "../../styles";
+import { Loading } from "../../../../../components/Loading";
 
 export type NewProduction = {
   memberName: string | null;
@@ -48,22 +49,28 @@ export default function NewProduction() {
   const { token } = useAuth();
   const navigate = useNavigate();
   const { id } = useParams();
-  const { data: members } = useQuery({
+
+  const { data: members, isLoading: membersLoading } = useQuery({
     queryKey: ["members"],
     queryFn: () => getMembers(token!),
   });
-  const { data: fetchedProduction } = useQuery({
+
+  const { data: fetchedProduction, isLoading: productionLoading } = useQuery({
     queryKey: ["productionLog", id],
     queryFn: () => getProductionLog(token!, id!),
     enabled: !!id,
   });
+
   const [production, setProduction] = useImmer<NewProduction>({
     memberName: null,
     date: new Date(),
     entries: [],
   });
-  const { mutate: submit } = useMutation({
-    mutationFn: (production: NewProduction) =>
+  const {
+    mutate: submit,
+    isPending: isSubmitting, 
+  } = useMutation({
+      mutationFn: (production: NewProduction) =>
       id
         ? patchProductionLog(token!, id, production)
         : postProductionLog(token!, production),
@@ -86,6 +93,10 @@ export default function NewProduction() {
     !production.entries.length ||
     production.entries.some((e) => !e.quantity);
 
+  if ((id && productionLoading) || membersLoading) {
+    return <Loading />;
+  }
+
   return (
     <S.Container>
       <S.Header>
@@ -107,6 +118,7 @@ export default function NewProduction() {
         </S.Title>
         <S.MemberAndDate>
           <Autocomplete
+            disabled={isSubmitting}
             sx={{ width: "100%" }}
             size="small"
             onChange={(_, value) =>
@@ -122,7 +134,7 @@ export default function NewProduction() {
               const { inputValue } = params;
 
               const isExisting = options.some(
-                (option) => inputValue === option
+                (option) => inputValue === option,
               );
               if (inputValue !== "" && !isExisting) {
                 filtered.push(inputValue);
@@ -141,8 +153,9 @@ export default function NewProduction() {
             value={production.memberName}
           />
           <DatePicker
+            disabled={isSubmitting}
             label="Data"
-            slotProps={{ textField: { size: "small" } }}
+            slotProps={{ textField: { size: "small", disabled: isSubmitting } }}
             onChange={(date) =>
               setProduction((draft) => {
                 draft.date = date?.toDate();
@@ -167,9 +180,10 @@ export default function NewProduction() {
               <TableRow key={index}>
                 <TableCell>
                   <DatePicker
+                    disabled={isSubmitting}
+                    slotProps={{ textField: { size: "small", disabled: isSubmitting } }}
                     label="Data"
                     sx={{ width: "100%" }}
-                    slotProps={{ textField: { size: "small" } }}
                     onChange={(date) =>
                       setProduction((draft) => {
                         draft.entries[index].date = date!.toDate();
@@ -180,6 +194,7 @@ export default function NewProduction() {
                 </TableCell>
                 <TableCell>
                   <ToggleButtonGroup
+                    disabled={isSubmitting}
                     onChange={(_, value) =>
                       setProduction((draft) => {
                         draft.entries[index].period =
@@ -199,6 +214,7 @@ export default function NewProduction() {
                 </TableCell>
                 <TableCell>
                   <TextField
+                    disabled={isSubmitting}
                     sx={{ width: "100%" }}
                     type="number"
                     size="small"
@@ -208,7 +224,7 @@ export default function NewProduction() {
                       setProduction((draft) => {
                         draft.entries[index].quantity = Math.max(
                           0,
-                          Number(event.target.value)
+                          Number(event.target.value),
                         );
                       });
                     }}
@@ -228,7 +244,7 @@ export default function NewProduction() {
                       setProduction((draft) => {
                         draft.entries[index].price = Math.max(
                           0,
-                          Number(event.target.value)
+                          Number(event.target.value),
                         );
                       });
                     }}
@@ -243,10 +259,11 @@ export default function NewProduction() {
                 <TableCell>
                   <IconButton
                     sx={{ color: "red" }}
+                    disabled={isSubmitting}
                     onClick={() =>
                       setProduction((draft) => {
                         draft.entries = draft.entries.filter(
-                          (_, i) => i !== index
+                          (_, i) => i !== index,
                         );
                       })
                     }
@@ -260,6 +277,7 @@ export default function NewProduction() {
         </Table>
         <Box sx={{ justifyContent: "center", display: "flex" }}>
           <Button
+            disabled={isSubmitting}
             onClick={() =>
               setProduction((draft) => {
                 draft.entries.push({
@@ -278,11 +296,11 @@ export default function NewProduction() {
           <h2>
             Total:{" "}
             {formatCurrency(
-              sum(production.entries.map((e) => e.price * e.quantity))
+              sum(production.entries.map((e) => e.price * e.quantity)),
             )}
           </h2>
           <Box sx={{ display: "flex", gap: "10px" }}>
-            <Button variant="red" as={Link} to="/producao">
+            <Button variant="red" as={Link} to="/producao" disabled={isSubmitting}>
               Cancelar
             </Button>
             <Button
@@ -290,7 +308,7 @@ export default function NewProduction() {
               onClick={() => submit(production)}
               variant={saveDisabled ? "gray" : undefined}
             >
-              Salvar
+              {isSubmitting ? "Salvando..." : "Salvar"}
             </Button>
           </Box>
         </Box>
