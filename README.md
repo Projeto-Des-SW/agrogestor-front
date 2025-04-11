@@ -49,6 +49,7 @@ O sistema possui dois tipos de usuários:
 - [TAP](https://docs.google.com/document/d/1XyYxsH_ts6aIiTBbc-8WWjJYTwSGBVuGKmBASS_gD3o/edit?usp=sharing)
 - [Plano de Projeto](https://docs.google.com/document/d/11TMAFIooPQIh7gFymsdcPu6l2xQK1dJXO5Or5i2x7b4/edit?usp=sharing)
 - [Pitch](https://drive.google.com/file/d/1vHg4xI_84TrzGU6Tvf4i906lCnDotH2M/view)
+- [Documentação da API](https://projetao-s4prr.ondigitalocean.app/api)
 
 # Tecnologias Usadas
 
