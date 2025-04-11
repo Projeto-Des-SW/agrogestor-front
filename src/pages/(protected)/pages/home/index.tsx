@@ -205,8 +205,8 @@ export default function Home() {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Data</TableCell>
                 <TableCell>Cliente</TableCell>
+                <TableCell>Data</TableCell>
                 <TableCell>Total</TableCell>
                 <TableCell align="right"></TableCell>
               </TableRow>
@@ -220,11 +220,11 @@ export default function Home() {
                     cursor: "pointer",
                     ":hover": { backgroundColor: "#f8f8f8" },
                   }}
-                >
+                > 
+                  <TableCell>{sale.member.name}</TableCell>
                   <TableCell>
                     {new Date(sale.date).toLocaleDateString()}
                   </TableCell>
-                  <TableCell>{sale.member.name}</TableCell>
                   <TableCell>
                     {formatCurrency(
                       sale.saleItems.reduce(
@@ -247,8 +247,8 @@ export default function Home() {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Data</TableCell>
                 <TableCell>Cliente</TableCell>
+                <TableCell>Data</TableCell>
                 <TableCell>Total</TableCell>
                 <TableCell align="right"></TableCell>
               </TableRow>
@@ -263,10 +263,10 @@ export default function Home() {
                     ":hover": { backgroundColor: "#f8f8f8" },
                   }}
                 >
+                  <TableCell>{log.member.name}</TableCell>
                   <TableCell>
                     {new Date(log.date).toLocaleDateString()}
                   </TableCell>
-                  <TableCell>{log.member.name}</TableCell>
                   <TableCell>
                     {formatCurrency(
                       log.productionEntries.reduce(

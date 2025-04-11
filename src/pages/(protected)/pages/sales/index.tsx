@@ -128,8 +128,8 @@ export default function Sales() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ width: "30%" }}>Data</TableCell>
               <TableCell sx={{ width: "30%" }}>Cliente</TableCell>
+              <TableCell sx={{ width: "30%" }}>Data</TableCell>
               <TableCell sx={{ width: "30%" }}>Total</TableCell>
               <TableCell sx={{ width: "10%" }}>Ações</TableCell>
             </TableRow>
@@ -137,8 +137,8 @@ export default function Sales() {
           <TableBody>
             {sales?.map((sale) => (
               <TableRow key={sale.id}>
-                <TableCell>{sale.date.toLocaleDateString()}</TableCell>
                 <TableCell>{sale.member.name}</TableCell>
+                <TableCell>{sale.date.toLocaleDateString()}</TableCell>
                 <TableCell>
                   {formatCurrency(
                     sum(

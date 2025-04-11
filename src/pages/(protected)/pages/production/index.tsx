@@ -136,8 +136,8 @@ export default function Production() {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ width: "30%" }}>Data</TableCell>
                 <TableCell sx={{ width: "30%" }}>Cliente</TableCell>
+                <TableCell sx={{ width: "30%" }}>Data</TableCell>
                 <TableCell sx={{ width: "30%" }}>Total</TableCell>
                 <TableCell sx={{ width: "10%" }}>Ações</TableCell>
               </TableRow>
@@ -145,8 +145,8 @@ export default function Production() {
             <TableBody>
               {productionLogs?.map((log) => (
                 <TableRow key={log.id}>
-                  <TableCell>{log.date.toLocaleDateString()}</TableCell>
                   <TableCell>{log.member.name}</TableCell>
+                  <TableCell>{log.date.toLocaleDateString()}</TableCell>
                   <TableCell>
                     {formatCurrency(
                       sum(
